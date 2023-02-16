@@ -9,7 +9,7 @@ let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
 let vpnRouter = require('./routes/vpn');
 
-let app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
