@@ -1,13 +1,13 @@
-let createError = require('http-errors');
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
-let connecDB = require('./db/connect')
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const connecDB = require('./db/connect')
 
-let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
-let vpnRouter = require('./routes/vpn');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const vpnRouter = require('./routes/vpn');
 
 const app = express();
 
