@@ -45,12 +45,10 @@ exports.loginUser = async (req, res) => {
             return res.status(400).json({error : `Wrong password provided`})
         }
 
-        // console.log(user)
-
         const subscription = user.updateSubscriptionPlan()
 
         const token = user.createJWT()
-        
+
         return res.status(200).json({message : 'User found', user, token, subscription})
 
     } catch (error) {
@@ -109,12 +107,17 @@ exports.updateUser = async (req, res) => {
             return res.status(404).json({error : "User does not exist"})
         }
 
-        return res.status(201).json({message : 'User data updated successfully', updateUser})
+        const subscription = updateUser.updateSubscriptionPlan()
+
+        await updateUser.save(); // save the updated user object to the database
+
+        return res.status(201).json({message : 'User data updated successfully', updateUser, subscription})
     } catch (error) {
         console.log(error)
         return res.status(500).json({message : 'Internal server error', error : error.message})
     }
 }
+
 
 exports.deleteUser = async (req, res) => {
     try {
