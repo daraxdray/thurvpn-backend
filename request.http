@@ -1,0 +1,9 @@
+GET http://localhost:3000/api/vpn/get-all
+Accept: application/json
+
+###
+
+GET http://localhost:3000/api/vpn/dwn/us
+Accept: application/json
+
+###
