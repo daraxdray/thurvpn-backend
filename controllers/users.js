@@ -14,10 +14,7 @@ exports.registerUser = async (req, res) => {
         return res.status(400).json({error : `User with the email you supplied already exists.`})   
     }
 
-    const newUser = await User.create(
-        {email : req.body.email,
-        password : req.body.password}
-    )
+    const newUser = await User.create({...req.body})
 
     const token = await newUser.createJWT()
 
@@ -48,7 +45,14 @@ exports.loginUser = async (req, res) => {
             return res.status(400).json({error : `Wrong password provided`})
         }
 
-        return res.status(200).json({message : 'User found', user})
+        // console.log(user)
+
+        const subscription = user.updateSubscriptionPlan()
+
+        const token = user.createJWT()
+        
+        return res.status(200).json({message : 'User found', user, token, subscription})
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({message : `Internal server error`, error : error.message})
@@ -68,7 +72,6 @@ exports.getSingleUser = async (req, res) => {
         if (!user) {
             return res.status(400).json({error : `No user with the provided id`})
         }
-
         return res.status(200).json({message : 'User found', user})
     } catch (error) {
         console.log(error)
