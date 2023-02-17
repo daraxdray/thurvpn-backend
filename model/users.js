@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.createJWT = function () {
-    return jwt.sign({id : this._id, email : this.email}, process.env.JWT_SECRET, {expiresIn : process.env.JWT_EXPIRES})
+    return jwt.sign({id : this._id, email : this.email}, process.env.JWT_SECRET)
 }
 
 userSchema.pre('save', function (next) {

@@ -1,45 +1,63 @@
 const User = require('../model/users')
 const speakeasy = require('speakeasy');
+const nodemailer = require('nodemailer');
 
 exports.registerUser = async (req, res) => {
-    try {
-      const {email} = req.body
-  
-      if (!email) {
-          return res.status(400).json({error : `Please provide your email address.`})
-      }
-  
-      const user = await User.findOne({email})
-  
-      if (user) {
-          return res.status(400).json({error : `User with the email you supplied already exists.`})   
-      }
-  
-      const secret = speakeasy.generateSecret();
-      
-      const token = speakeasy.totp({
-          secret: secret.base32,
-          encoding: 'base32',
-          time: 600000 // time in 5 minutes
-        });      
-  
-      const newUser = await User.create({
-        ...req.body,
-        otpSecret: secret.base32,
-        otpVerified: false
-      });
-  
-      const jwt = newUser.createJWT()
-  
-      // Here you can send the OTP to the user via email, SMS or some other means
-      // You can use a third-party library like nodemailer to send emails
-      // In this example, we are simply sending the OTP back to the client for testing purposes
-      return res.status(201).json({message : 'OTP generated and sent', newUser, token, jwt});
-    } catch (error) {
-      console.log(error)
-      return res.status(500).json({message : 'Internal server error...', error : error.message}) 
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Please provide your email address.' });
     }
-  } 
+
+    const user = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({ error: 'User with the email you supplied already exists.' });
+    }
+
+    const secret = speakeasy.generateSecret();
+
+    const otp = speakeasy.totp({
+      secret: secret.base32,
+      encoding: 'base32',
+      time: 600000, // time in 5 minutes
+    });
+
+    const newUser = await User.create({
+      ...req.body,
+      otpSecret: secret.base32,
+      otpVerified: false,
+    });
+
+    // create reusable transporter object
+    let transporter = nodemailer.createTransport({
+        service : 'gmail',
+        auth : {
+            user : "stephen.ignatius@korsgy.com",
+            pass : "tczkonuzmpehzbeg"
+        }
+    })
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '"THURVPN" <youremail@gmail.com>', // sender address
+      to: email, // list of receivers
+      subject: 'OTP REQUEST', // Subject line
+      html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
+              <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
+            </div>`, // html body
+    });
+
+    console.log('Message sent: %s', info.messageId);
+
+    return res.status(201).json({ message: 'OTP generated and sent', newUser, otp });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Internal server error...', error: error.message });
+  }
+};
   
   exports.loginUser = async (req, res) => {
       try {
@@ -76,13 +94,73 @@ exports.registerUser = async (req, res) => {
   
           const jwt = user.createJWT()
   
-          return res.status(200).json({message : 'User found', user, jwt, subscription})
+          return res.status(200).json({message : 'User found', user, jwt})
   
       } catch (error) {
           console.log(error)
           return res.status(500).json({message : `Internal server error`, error : error.message})
       }
   }
+  
+  exports.resendOTP = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      if (!email) {
+        return res.status(400).json({ error: `Please provide your email address.` });
+      }
+  
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(400).json({ error: `User with the email you supplied does not exist.` });
+      }
+  
+      if (user.otpVerified) {
+        return res.status(400).json({ error: `User has already been verified.` });
+      }
+  
+      const secret = speakeasy.generateSecret();
+  
+      const otp = speakeasy.totp({
+        secret: secret.base32,
+        encoding: 'base32',
+        time: 600000 // time in 5 minutes
+      });
+  
+      user.otpSecret = secret.base32;
+      await user.save();
+
+      const jwt = user.createJWT()
+  
+      /// create reusable transporter object
+      let transporter = nodemailer.createTransport({
+        service : 'gmail',
+        auth : {
+            user : "stephen.ignatius@korsgy.com",
+            pass : "tczkonuzmpehzbeg"
+        }
+        })
+
+        // send mail with defined transport object
+        let info = await transporter.sendMail({
+        from: '"THURVPN" <youremail@gmail.com>', // sender address
+        to: email, // list of receivers
+        subject: 'OTP REQUEST', // Subject line
+        html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
+                <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
+                </div>`, // html body
+        });
+
+        console.log('Message sent: %s', info.messageId);
+
+      return res.status(200).json({ message: 'New OTP generated and sent', user, otp, jwt });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: 'Internal server error...', error: error.message });
+    }
+  };
   
 exports.getSingleUser = async (req, res) => {
     try {
