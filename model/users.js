@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -8,10 +7,14 @@ const userSchema = new mongoose.Schema({
     required: true
   },
 
-  password : {
-    type  : String,
-    required : true
-  }, 
+  otpSecret : {
+    type : String
+  },
+
+  otpVerified : {
+    type : Boolean,
+    default : false
+  },
 
   deviceModel: {
     type: String,
@@ -27,23 +30,8 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next()
-  }
-  const salt = await bcrypt.genSalt(10)
-  this.password = await bcrypt.hash(this.password, salt)
-  next()
-})
-
-
 userSchema.methods.createJWT = function () {
     return jwt.sign({id : this._id, email : this.email}, process.env.JWT_SECRET, {expiresIn : process.env.JWT_EXPIRES})
-}
-
-userSchema.methods.comparePasswords = async function (userPassword) {
-    const isMatch = await bcrypt.compare(userPassword, this.password)
-    return isMatch
 }
 
 userSchema.pre('save', function (next) {
