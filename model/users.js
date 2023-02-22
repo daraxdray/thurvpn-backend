@@ -2,6 +2,12 @@ const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 
 const userSchema = new mongoose.Schema({
+
+  username : {
+    type : String,
+    required : true
+  },
+
   email: {
     type: String,
     required: true
@@ -31,7 +37,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.createJWT = function () {
-    return jwt.sign({id : this._id, email : this.email}, process.env.JWT_SECRET)
+    return jwt.sign({id : this._id, username : this.username, email : this.email}, process.env.JWT_SECRET)
 }
 
 userSchema.pre('save', function (next) {
