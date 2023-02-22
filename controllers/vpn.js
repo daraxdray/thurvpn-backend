@@ -32,8 +32,9 @@ exports.getAll = async (req, res) => {
     })
     //appending fullpath
     const filteredVPN = result.filter(r => r.ovpn.length > 0);
+    console.log(req.user)
     res.json({
-        user : `Welcome ${req.user.email}`,
+        user : `Welcome ${req.user.username}`,
         message: "successful",
         status: true,
         data: filteredVPN
