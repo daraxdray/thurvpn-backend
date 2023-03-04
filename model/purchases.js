@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-
+const moment = require('moment');
+const Plan = require('./plans')
 const purchaseSchema = new mongoose.Schema({
     user_id : {
         type : mongoose.Schema.Types.ObjectId,
@@ -11,10 +12,36 @@ const purchaseSchema = new mongoose.Schema({
         ref : 'Plan'
     },
 
-    purchase_validity : {
+    active : {
         type : Boolean,
         default : false
+    },
+    created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date, default: Date.now }
+},)
+purchaseSchema.virtual('daysCount').get(function() {
+  const startDate = moment(this.updated_at);
+  const endDate = moment();
+  const days = endDate.diff(startDate, 'days');
+  return `${days}`;
+});
+
+
+
+purchaseSchema.pre('save', function(next) {
+    const now = Date.now();
+    this.updated_at = now;
+    if (!this.created_at) {
+      this.created_at = now;
     }
-})
+    next();
+  });
+  
+  purchaseSchema.pre('update', function(next) {
+    const now = Date.now();
+    this.updated_at = now;
+    next();
+  });
+
 
 module.exports = mongoose.model('Purchase', purchaseSchema)

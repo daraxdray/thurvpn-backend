@@ -3,8 +3,8 @@ let path = require('path');
 let sha1 = require('sha1');
 let os = require('os');
 //import raw jsonArray for countries
-let countryArray = require('./../ovpn/CountryVars.json');
-let qi = require('./../ovpn/vpn/tmp.json');
+let countryArray = require('../ovpn/CountryVars.json');
+let qi = require('../ovpn/vpn/tmp.json');
 const _path = './../ovpn/vpn/';
 
 

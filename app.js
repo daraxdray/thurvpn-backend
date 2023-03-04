@@ -4,11 +4,13 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const connecDB = require('./db/connect')
-const authMiddleware = require('./middleware/authentication')
+const {authMiddleware,authAdmin} = require('./middleware/authentication')
 
-const indexRouter = require('./routes/index');
+const indexRouter = require('./routes');
 const usersRouter = require('./routes/users');
 const vpnRouter = require('./routes/vpn');
+const planRouter = require('./routes/plans');
+const purchaseRouter = require('./routes/purchases');
 
 const app = express();
 
@@ -25,10 +27,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/vpn', authMiddleware, vpnRouter);
+app.use('/api/plans', planRouter);
+app.use('/api/purchases',purchaseRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  // next(createError(404));
+  return res.status(404).json({status:false, message:"Resource not found",data:null})
 });
 
 // error handler

@@ -102,3 +102,12 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+
+
+global.failedResponseHandler = (error,res)=>{
+  if(process.env.DEBUG_MODE){
+    return res.status(error.statusCode || 500).json({message : `Server error: ${error.message}`, status: false, data:{stack:error.stack,name:error.name, statusCode:error.statusCode}})
+  }
+  return res.status(error.statusCode || 500).json({message : `Unexpected error`, data:[], status: false})
+}

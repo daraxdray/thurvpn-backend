@@ -1,19 +1,21 @@
 const User = require('../model/users')
+const Plan = require('../model/plans')
 const speakeasy = require('speakeasy');
 const nodemailer = require('nodemailer');
+
 
 exports.registerUser = async (req, res) => {
   try {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ error: 'Please provide your email address.' });
+      return res.status(400).json({ message: 'Please provide your email address.' , status:false, data:[]});
     }
 
-    const user = await User.findOne({ email });
+    const foundUser = await User.findOne({ email });
 
-    if (user) {
-      return res.status(400).json({ error: 'User with the email you supplied already exists.' });
+    if (foundUser) {
+      return res.status(400).json({ message: 'User with the email you supplied already exists.' , status: false, data:[]});
     }
 
     const secret = speakeasy.generateSecret();
@@ -24,7 +26,7 @@ exports.registerUser = async (req, res) => {
       time: 600000, // time in 5 minutes
     });
 
-    const newUser = await User.create({
+    const user = await User.create({
       ...req.body,
       otpSecret: secret.base32,
       otpVerified: false,
@@ -52,27 +54,29 @@ exports.registerUser = async (req, res) => {
 
     console.log('Message sent: %s', info.messageId);
 
-    return res.status(201).json({ message: 'OTP generated and sent', newUser, otp });
+    return res.status(201).json({ message: 'OTP generated and sent', data:{user, otp},status:true});
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: 'Internal server error...', error: error.message });
+    console.log("The ERR",error);
+    return res.status(400).json({ message: "Internal server error", status: false,data:[]  });
   }
 };
   
   exports.loginUser = async (req, res) => {
       try {
-          const {email, token} = req.body
+          const {email, token, deviceId, deviceName} = req.body
   
-          if (!email || !token) {
-              return res.status(400).json({error : `Please provide all the required parameters`})
+          if (!email || !token || !deviceId, !deviceName) { 
+              const msg = (!email?"Email, ":'') + (!token?"Token, ":'') + (!deviceId?"Device ID, ":'') + (!deviceName?"Device Name":"")
+              return res.status(400).json({msg : `Please provide all the required parameters: ${msg}`, status:false,data:[]})
           }
   
-          const user = await User.findOne({email})
+          const user = await User.findOne({email}).populate('activePlan')
   
           if (!user) {
-              return res.status(400).json({error : `Email does not exist, please sign up`})
+              return res.status(400).json({msg : `Email does not exist, please sign up`, status: false, data:[]})
           }
   
+          //ONE TIME VERIFICATION
           if (!user.otpVerified) {
               const verified = speakeasy.totp.verify({
                 secret: user.otpSecret,
@@ -82,19 +86,36 @@ exports.registerUser = async (req, res) => {
               });
   
               if (!verified) {
-                return res.status(400).json({error : `Invalid OTP`})
+                return res.status(400).json({msg : `Invalid OTP`, status:false,data:[]})
               }
   
               // If the OTP is verified, mark the user as verified in the database
               user.otpVerified = true;
               await user.save();
           }
-  
-          const subscription = user.updateSubscriptionPlan()
-  
+          
+          //CHECK ACTIVE SUBSCRIPTION
+          console.log(deviceId in user.devices)
+          if(user.isPremium && (deviceId in user.devices == false)){
+            //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
+            const plan = await Plan.findOne({_id:user.activePlan.plan_id});
+            
+            if(plan && (user.devices.size < 5)){
+            
+              const deviceMap = user.devices;
+              
+              deviceMap.set(deviceId,{deviceName:deviceName,deviceId:deviceId})
+              user.set('devices',deviceMap)
+            }
+          }
+          
+          // const subscription = user.updateSubscriptionPlan()
+          //create and save session/ device token 
           const jwt = user.createJWT()
-  
-          return res.status(200).json({message : 'User found', user, jwt})
+          user.deviceToken = jwt;
+          await user.save();
+
+          return res.status(200).json({msg : 'User found', data: {user, jwt},status:true})
   
       } catch (error) {
           console.log(error)
@@ -107,17 +128,17 @@ exports.registerUser = async (req, res) => {
       const { email } = req.body;
   
       if (!email) {
-        return res.status(400).json({ error: `Please provide your email address.` });
+        return res.status(400).json({ message: `Please provide your email address.` ,data:[],status:false});
       }
   
       const user = await User.findOne({ email });
   
       if (!user) {
-        return res.status(400).json({ error: `User with the email you supplied does not exist.` });
+        return res.status(400).json({ message: `User with the email you supplied does not exist.` ,data:[],status:false});
       }
   
       if (user.otpVerified) {
-        return res.status(400).json({ error: `User has already been verified.` });
+        return res.status(400).json({ message: `User has already been verified.` ,data:[],status:false});
       }
   
       const secret = speakeasy.generateSecret();
@@ -155,10 +176,10 @@ exports.registerUser = async (req, res) => {
 
         console.log('Message sent: %s', info.messageId);
 
-      return res.status(200).json({ message: 'New OTP generated and sent', user, otp, jwt });
+      return res.status(200).json({ message: 'New OTP generated and sent',data:{ user, otp, jwt}, status:true});
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ message: 'Internal server error...', error: error.message });
+      return res.status(400).json({ message: 'Internal server error...',status:false,data:[]});
     }
   };
   
@@ -167,18 +188,24 @@ exports.getSingleUser = async (req, res) => {
         const {id : userId} = req.params
 
         if (!userId) {
-            return res.status(400).json({error : 'Missing user ID'})
+            return res.status(400).json({msg : 'Missing user ID', status: false, data:[]})
         }
 
-        const user = await User.findOne({_id : userId})
+        const user = await User.findOne({_id : userId}).populate('activePlan')
 
         if (!user) {
-            return res.status(400).json({error : `No user with the provided id`})
+            return res.status(400).json({msg : `No user with the provided id`, status: false, data:[]})
         }
-        return res.status(200).json({message : 'User found', user})
+
+        //GET HOW MANY DAYS OF ACTIVEPLAN 
+        // if(user.activePlan){        
+         
+        //   return res.status(200).json({msg : 'User found',  status: true, data:{user,daysUsed}})
+        // }
+        return res.status(200).json({msg : 'User found',  status: true, data:user})
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal server error', error : error.message})
+        return res.status(401).json({msg : 'Unable to get user data', status :false, data:[]})
     }
 }
 
@@ -190,11 +217,11 @@ exports.getAllUsers = async (req, res) => {
             return res.status(404).json({error : "No users found!"})
         }
 
-        return res.status(404).json({total_users : users.length, users})
+        return res.status(200).json({data : {count:users.length, users}, status: true, message:"User listed"})
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal server error', error : error.message})
+        return res.status(500).json({msg : 'Internal server error', status :false, data:[]})
     }
 }
 
@@ -203,13 +230,13 @@ exports.updateUser = async (req, res) => {
         const {id : userId} = req.params
 
         if (!userId) {
-            return res.status(400).json({error : 'Missing user ID'})
+            return res.status(400).json({msg : 'Missing user ID',data:[], status:false})
         }
 
         const updateUser = await User.findByIdAndUpdate({_id : userId}, req.body, {new : true, runValidators : true})
 
         if (!updateUser) {
-            return res.status(404).json({error : "User does not exist"})
+            return res.status(404).json({msg : "User does not exist", data:[], status:false})
         }
 
         const subscription = updateUser.updateSubscriptionPlan()
@@ -219,7 +246,7 @@ exports.updateUser = async (req, res) => {
         return res.status(201).json({message : 'User data updated successfully', updateUser, subscription})
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal server error', error : error.message})
+        return res.status(500).json({message : 'Internal server error', status : false, data:[]})
     }
 }
 
@@ -235,12 +262,13 @@ exports.deleteUser = async (req, res) => {
         const deleteUser = await User.findByIdAndDelete(userId)
 
         if (!deleteUser) {
-            return res.status(404).json({error : "User does not exist"})
+            return res.status(404).json({msg : "User does not exist", data:[], status:false})
         }
 
-        return res.status(200).json({message : 'User deleted successfully', user_info : deleteUser})
+        return res.status(200).json({msg : 'User deleted successfully', data:deleteUser, status: true})
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal server error', error : error.message})
+        return res.status(500).json({msg : 'Internal server error', data : [], status:false})
     }
 }
+
