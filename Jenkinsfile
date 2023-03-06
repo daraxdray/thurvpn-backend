@@ -21,13 +21,25 @@ pipeline {
         }
 
         stage('Increment Version') {
+            when {
+                expression {
+                    BRANCH_NAME == 'prod'
+                }
+            }
+
             steps {
                 script {
                     gv.Versioning()
                 }
             }
         }
+
         stage("build app") {
+            when {
+                expression {
+                    BRANCH_NAME == 'prod'
+                }
+            }
             steps {
                 script {
                     gv.buildApp()
@@ -35,6 +47,11 @@ pipeline {
             }
         }
         stage("build image") {
+            when {
+                expression {
+                    BRANCH_NAME == 'prod'
+                }
+            }
             steps {
                 script {
                     gv.buildImage()
@@ -42,6 +59,11 @@ pipeline {
             }
         }
         stage("deploy") {
+            when {
+                expression {
+                    BRANCH_NAME == 'prod'
+                }
+            }
             environment {
                 AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
                 AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
@@ -55,6 +77,11 @@ pipeline {
 
         }
         stage('commit version update') {
+            when {
+                expression {
+                    BRANCH_NAME == 'prod'
+                }
+            }
             steps {
                 script {
                     gv.commitVisioning()
