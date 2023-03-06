@@ -208,6 +208,31 @@ exports.getSingleUser = async (req, res) => {
         return res.status(401).json({msg : 'Unable to get user data', status :false, data:[]})
     }
 }
+exports.getUserDevices = async (req, res) => {
+    try {
+        const {id : userId} = req.params
+
+        if (!userId) {
+            return res.status(400).json({msg : 'Missing user ID', status: false, data:[]})
+        }
+
+        const user = await User.findOne({_id : userId})
+
+        if (!user) {
+            return res.status(400).json({msg : `No user with the provided id`, status: false, data:[]})
+        }
+
+        //GET HOW MANY DAYS OF ACTIVEPLAN 
+        // if(user.activePlan){        
+         
+        //   return res.status(200).json({msg : 'User found',  status: true, data:{user,daysUsed}})
+        // }
+        return res.status(200).json({msg : 'User found',  status: true, data:user.devices})
+    } catch (error) {
+        console.log(error)
+        return res.status(401).json({msg : 'Unable to get user data', status :false, data:[]})
+    }
+}
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -232,7 +257,7 @@ exports.updateUser = async (req, res) => {
         if (!userId) {
             return res.status(400).json({msg : 'Missing user ID',data:[], status:false})
         }
-
+        delete req.body.email //removes email object
         const updateUser = await User.findByIdAndUpdate({_id : userId}, req.body, {new : true, runValidators : true})
 
         if (!updateUser) {
