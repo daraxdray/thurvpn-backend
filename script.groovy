@@ -17,7 +17,7 @@ def buildApp() {
 
 def buildImage() {
       echo "building the docker image..."
-      withCredentials([usernamePassword(credentialsId: 'ecr-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+      withCredentials([usernamePassword(credentialsId: 'ecr-credential', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
         
           sh "docker build -t ${IMAGE_REPO}:${imageVersion} ."
           sh "echo $PASS | docker login -u $USER --password-stdin ${ECR_REPO_URL}"
@@ -40,7 +40,7 @@ def commitVisioning() {
         sh "git remote set-url origin https://${USER}:${PASS}gitlab.com/korsgy-technologies/hosted-solution/thur_vpn_backend.git"
         sh 'git add .'
         sh 'git commit -m "ci: version bump"'
-        sh 'git push origin HEAD:devops-test-20230306'
+        sh 'git push origin HEAD:prod'
     }
 }
 return this
