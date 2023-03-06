@@ -35,7 +35,7 @@ app.use(function (req, res, next) {
 
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/vpn', authMiddleware, vpnRouter);
+app.use('/api/vpn', vpnRouter);
 app.use('/api/plans', planRouter);
 app.use('/api/purchases',purchaseRouter);
 

@@ -6,9 +6,9 @@ const {createPurchase,getPurchaseById,getPurchaseByUserId,getAllPurchases} = req
 
 
 router.route('/create').post(authMiddleware,createPurchase)
-router.route('/get/:purchaseId').get(authMiddleware,getPurchaseById)
+router.route('/get/:purchaseId').get(getPurchaseById)
 router.route('/get-all').get(authAdmin,getAllPurchases)
-router.route('/get-user-purchase/:userId').get(authMiddleware,getPurchaseByUserId)
+router.route('/get-user-purchase/:userId').get(getPurchaseByUserId)
 
 
 module.exports = router;
