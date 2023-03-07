@@ -52,7 +52,10 @@ pipeline {
             }
             steps {
                 script {
-                    gv.deployApp()
+                    // gv.deployApp()
+                    echo 'deploying the image...'
+                    sh 'envsubst < k8s/deployment.yaml | kubectl apply -f -'
+                    sh 'envsubst < k8s/service.yaml | kubectl apply -f -'
                 }
             }
 
