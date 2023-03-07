@@ -48,14 +48,13 @@ pipeline {
             environment {
                 AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
                 AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
-                // APP_NAME = 'thurvpnapi'
             }
             steps {
                 script {
                     // gv.deployApp()
                     echo 'deploying the image...'
-                    sh 'envsubst < k8s/deployment.yaml | kubectl apply -f -'
-                    sh 'envsubst < k8s/service.yaml | kubectl apply -f -'
+                    sh 'envsubst < kubernetes/deployment.yaml | kubectl apply -f -'
+                    sh 'envsubst < kubernetes/service.yaml | kubectl apply -f -'
                 }
             }
 
