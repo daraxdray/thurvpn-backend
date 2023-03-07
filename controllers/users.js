@@ -96,7 +96,7 @@ exports.registerUser = async (req, res) => {
           
           //CHECK ACTIVE SUBSCRIPTION
           console.log(deviceId in user.devices)
-          if(user.isPremium && (deviceId in user.devices == false)){
+          if(user.isPremium && (user.devices != null && deviceId in user.devices == false)){
             //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
             const plan = await Plan.findOne({_id:user.activePlan.plan_id});
             
