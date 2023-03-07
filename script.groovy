@@ -18,7 +18,6 @@ def buildApp() {
 def buildImage() {
       echo "building the docker image..."
       withCredentials([usernamePassword(credentialsId: 'ecr-credential', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-        
           sh "docker build -t ${IMAGE_REPO}:${imageVersion} ."
           sh "echo $PASS | docker login -u $USER --password-stdin ${ECR_REPO_URL}"
           sh "docker push ${IMAGE_REPO}:${imageVersion}"
