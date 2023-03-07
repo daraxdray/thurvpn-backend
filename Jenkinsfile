@@ -9,6 +9,7 @@ pipeline {
     environment {
         ECR_REPO_URL = '844268948863.dkr.ecr.us-east-1.amazonaws.com'
         IMAGE_REPO = "${ECR_REPO_URL}/thurapi"
+        APP_NAME = 'thurvpnapi'
     }
 
     stages {
@@ -48,7 +49,6 @@ pipeline {
             environment {
                 AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
                 AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
-                APP_NAME = 'thurapi'
             }
             steps {
                 script {
