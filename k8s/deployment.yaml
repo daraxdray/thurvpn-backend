@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: $APP_NAME
+  name: thurvpnapi
   labels:
-    app: $APP_NAME
+    app: thurvpnapi
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: $APP_NAME
+      app: thurvpnapi
   template:
     metadata:
       labels:
-        app: $APP_NAME
+        app: thurvpnapi
     spec:
       imagePullSecrets:
-        - name: my-registry-key
+        - name: aws-ecr-key
       containers:
-      - name: $APP_NAME
+      - name: thurvpnapi
         image: $IMAGE_REPO:$imageVersion
         imagePullPolicy: Always
         ports:
