@@ -24,11 +24,11 @@ def buildImage() {
       }
 } 
 
-def deployApp() {
-    echo 'deploying the image...'
-    sh 'envsubst < k8s/deployment.yaml | kubectl apply -f -'
-    sh 'envsubst < k8s/service.yaml | kubectl apply -f -'
-} 
+// def deployApp() {
+//     echo 'deploying the image...'
+//     sh 'envsubst < k8s/deployment.yaml | kubectl apply -f -'
+//     sh 'envsubst < k8s/service.yaml | kubectl apply -f -'
+// } 
 
 def commitVisioning() {
     //Authenticating to git
