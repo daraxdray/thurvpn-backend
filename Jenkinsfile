@@ -51,10 +51,13 @@ pipeline {
             }
             steps {
                 script {
-                    // gv.deployApp()
                     echo 'deploying the image...'
-                    sh 'envsubst < kubernetes/deployment.yaml | kubectl apply -f -'
-                    sh 'envsubst < kubernetes/service.yaml | kubectl apply -f -'
+                    sh 'kubectl apply -f kubernetes/deployment.yaml'
+                    sh 'kubectl apply -f kubernetes/service.yaml'
+                    // gv.deployApp()
+                   
+                    // sh "envsubst < kubernetes/deployment.yaml | kubectl apply -f -"
+                    // sh "envsubst < kubernetes/service.yaml | kubectl apply -f -"
                 }
             }
 
