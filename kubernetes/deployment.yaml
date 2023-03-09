@@ -18,7 +18,7 @@ spec:
         - name: aws-ecr-key
       containers:
       - name: thurvpnapi
-        image: $IMAGE_REPO:$imageVersion
+        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
