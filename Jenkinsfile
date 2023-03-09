@@ -7,8 +7,8 @@ pipeline {
     tools {nodejs "node"}
 
     environment {
-        ECR_REPO_URL = '844268948863.dkr.ecr.us-east-1.amazonaws.com'
-        IMAGE_REPO = "${ECR_REPO_URL}/thurapi"
+        ECR_REPO_URL = '844268948863.dkr.ecr.us-west-1.amazonaws.com'
+        IMAGE_REPO = "${ECR_REPO_URL}/thurvpnapi"
     }
 
     stages {
@@ -51,10 +51,7 @@ pipeline {
             }
             steps {
                 script {
-                    // gv.deployApp()
-                   echo 'deploying the image...'
-                    sh "envsubst < kubernetes/deployment.yaml | kubectl apply -f -"
-                    sh "envsubst < kubernetes/service.yaml | kubectl apply -f -"
+                    gv.deployApp()
                 }
             }
 

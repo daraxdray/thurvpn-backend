@@ -6,7 +6,7 @@ resource "random_string" "suffix" {
 
 # A local value assigns a name to an expression, so you can use it multiple times within a module without repeating it: https://www.terraform.io/docs/configuration/locals.html
 locals {
-    cluster_name = "thurvpn-eks-${random_string.suffix.result}" # variable but with expression as value
+    cluster_name = "thurvpnapi-eks-${random_string.suffix.result}" # variable but with expression as value
 }
 
 variable private_subnet_cidr_blocks {}

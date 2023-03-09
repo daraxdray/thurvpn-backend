@@ -1,24 +1,24 @@
 terraform {
   required_version = ">= 0.12"
   backend "s3" {
-    bucket = "thurvpn"
-    key = "thurvpn/state.tfstate"
-    region = "us-east-1"
+    bucket = "korsgy"
+    key = "korsgy-thurvpn/state.tfstate"
+    region = "us-west-1"
   }
 }
 provider "aws" {
-  region = "us-east-1"
+  region = "us-west-1"
 }
 
 data "aws_availability_zones" "azs" {}
 
 
 
-module "thurvpn-vpc" {
+module "thurvpnapi-vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
 
-  name = "thurvpn-vpc"
+  name = "thurvpnapi-vpc"
   cidr = var.vpc_cidr_block
   private_subnets = var.private_subnet_cidr_blocks
   public_subnets = var.public_subnet_cidr_blocks
@@ -29,16 +29,16 @@ module "thurvpn-vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    "kubernetes.io/cluster/thurvpn-eks-cluster" = "shared"
+    "kubernetes.io/cluster/thurvpnapi-eks-cluster" = "shared"
   }
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/thurvpn-eks-cluster" = "shared"
+    "kubernetes.io/cluster/thurvpnapi-eks-cluster" = "shared"
     "kubernetes.io/role/elb" = 1
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/thurvpn-eks-cluster" = "shared"
+    "kubernetes.io/cluster/thurvpnapi-eks-cluster" = "shared"
      "kubernetes.io/role/internal-elb" = 1
   }
 }
