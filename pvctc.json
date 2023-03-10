@@ -1,0 +1,37 @@
+[
+ {  "type": "privacy",
+   "data":[
+        {"title":"",
+        "body":"This document (\"Privacy Policy\") explains the privacy rules applicable to all information collected or submitted when you access, install, or use the VPNite Services"},
+        {"title":"",
+            "body":"All definitions and capitalized words used in this Privacy Policy are defined here or in our General Terms."
+        },
+        {"title":"",
+            "body":"To use any of our Services, you must set up an account. You are solely responsible for all usage or activity on your account including, but not limited to, use of the account by any person who uses your account, with or without authorization, or who has access to any computer on which your account resides or is accessible."
+        },
+        {"title":"",
+            "body":"By visiting our websites, by submitting your personal data to us, and by accessing, installing and/or using the Services, you confirm that you have read this Privacy Policy and agree to be bound by this Privacy Policy. If you disagree with the rules of this Privacy Policy, please do not use our Services."
+        },
+        {"title":"",
+            "body":"Information in this Privacy Policy is provided in layers, meaning that all information related to our general personal data processing practices is provided here. Meanwhile, additional Service-specific information applicable to separate VPNite products or websites are accessible via links in this Privacy Policy. "
+        },
+        {"title":"",
+            "body":"Information in this Privacy Policy is provided in layers, meaning that all information related"
+        }
+    ]
+},
+  
+{   "type":"terms",
+    "data":[
+        {"title":"1. Your Agreement with VPNite",
+            "body":"Additional Terms. Our Services are subject to one or more of the additional terms below (\"Additional Terms\"). If there is any conflict between the terms in the General Terms and the Additional Terms, then the Additional Terms govern in relation to that Service."
+        },
+        {"title":"2. Our Services",
+            "body":"To use any of our Services, you must set up an account. You are solely responsible for all usage or activity on your account including, but not limited to, use of the account by any person who uses your account, with or without authorization, or who has access to any computer on which your account resides or is accessible."
+        },
+        {"title":"3. License conditions",
+            "body":"Subject to the terms and conditions of these Terms, we grant you a limited, revocable, non- exclusive, personal, non-transferable, non- sublicensable, fixed-term license to: (1) download and use a copy of our software; and (2) use the Services, including, without limitation, the products and services made"
+        }
+
+]}
+    ]

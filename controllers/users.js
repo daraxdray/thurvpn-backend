@@ -73,33 +73,28 @@ exports.registerUser = async (req, res) => {
           const user = await User.findOne({email}).populate('activePlan')
   
           if (!user) {
-              return res.status(400).json({msg : `Email does not exist, please sign up`, status: false, data:[]})
+              return res.status(400).json({msg : `Email does not exist, please send OTP`, status: false, data:[]})
           }
   
-          //ONE TIME VERIFICATION
-          if (!user.otpVerified) {
-              const verified = speakeasy.totp.verify({
-                secret: user.otpSecret,
-                encoding: 'base32',
-                token: token,
-                window: 600000 // time in 5 minutes
-              });
-  
-              if (!verified) {
-                return res.status(400).json({msg : `Invalid OTP`, status:false,data:[]})
-              }
-  
-              // If the OTP is verified, mark the user as verified in the database
-              user.otpVerified = true;
-              await user.save();
+          //VALIDATE OTP
+          const verified = speakeasy.totp.verify({
+            secret: user.otpSecret,
+            encoding: 'base32',
+            token: token,
+            window: 600000 // time in 5 minutes
+          });
+
+          if (!verified) {
+            return res.status(400).json({msg : `Invalid OTP`, status:false,data:[]})
           }
-          
+
+         
           //CHECK ACTIVE SUBSCRIPTION
           if(user.isPremium && (user.devices != null && deviceId in user.devices == false)){
             //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
             const plan = await Plan.findOne({_id:user.activePlan.plan_id});
             
-            if(plan && (user.devices.size < 5)){
+            if(plan && (user.devices.size < plan.devices)){
             
               const deviceMap = user.devices;
               
@@ -117,12 +112,12 @@ exports.registerUser = async (req, res) => {
           return res.status(200).json({msg : 'User found', data: {user, jwt},status:true})
   
       } catch (error) {
-          console.log(error)
+          
           return res.status(500).json({message : `Internal server error`, error : error.message})
       }
   }
   
-  exports.resendOTP = async (req, res) => {
+  exports.sendOTP = async (req, res) => {
     try {
       const { email } = req.body;
   
@@ -130,15 +125,15 @@ exports.registerUser = async (req, res) => {
         return res.status(400).json({ message: `Please provide your email address.` ,data:[],status:false});
       }
   
-      const user = await User.findOne({ email });
+      let user = await User.findOne({ email });
   
       if (!user) {
-        return res.status(400).json({ message: `User with the email you supplied does not exist.` ,data:[],status:false});
+        user = new User({email:email})
       }
   
-      if (user.otpVerified) {
-        return res.status(400).json({ message: `User has already been verified.` ,data:[],status:false});
-      }
+      // if (user.otpVerified) {
+      //   return res.status(400).json({ message: `User has already been verified.` ,data:[],status:false});
+      // }
   
       const secret = speakeasy.generateSecret();
   
