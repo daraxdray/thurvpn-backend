@@ -14,11 +14,12 @@ spec:
       labels:
         app: thurvpnapi
     spec:
-      imagePullSecrets:
-        - name: aws-ecr-key
+      nodeSelector:
+        doks.digitalocean.com/node-pool: "thurvpnapi-pool"
+      restartPolicy: Always
       containers:
       - name: thurvpnapi
-        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
+        image: $regName/$imageName:$imageVersion
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
