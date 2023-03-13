@@ -16,7 +16,7 @@ pipeline {
     environment {
         regDomain           = 'registry.digitalocean.com'
         regName             = "${regDomain}/ogc-reg"
-        registryCredentials = 'thurvpnapi-reg-cred'
+        registryCredentials = 'do-api-token'
         imageName           = 'thurvpnapi'
         clusterAPI          = 'DOKS-API-URL'
         clusterCredentials  = 'thurvpnapi-config'
