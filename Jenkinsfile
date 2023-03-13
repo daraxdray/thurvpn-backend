@@ -1,6 +1,12 @@
 #!/usr/bin/env groovy
 //Shared library
-@Library ('Korsgy-Shared-Library')_ 
+library identifier: 'jenkins-shared-library@master', retriever: modernSCM(
+        [$class: 'GitSCMSource',
+         remote: 'https://gitlab.com/korsgy-technologies/korsgy-shared-library-main.git',
+         credentialsId: 'gitlab-credentials'
+        ]
+)
+
 
 pipeline {
     agent any
