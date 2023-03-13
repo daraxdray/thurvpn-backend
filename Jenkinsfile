@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 //Shared library
-library identifier: 'jenkins-shared-library@master', retriever: modernSCM(
+library identifier: 'korsgy-shared-library-main@master', retriever: modernSCM(
         [$class: 'GitSCMSource',
          remote: 'https://gitlab.com/korsgy-technologies/korsgy-shared-library-main.git',
          credentialsId: 'gitlab-credentials'
@@ -113,7 +113,7 @@ pipeline {
             emailext    body: "${currentBuild.currentResult}: OGC- ${env.imageName} build ${env.BUILD_NUMBER}\n To view the result, check console output for more info at: \n $env.BUILD_URL/console",
                         to: '$DEFAULT_RECIPIENTS',
                         attachLog: true,
-                        subject: "OGC-Backend - Build # $env.BUILD_NUMBER - ${currentBuild.currentResult}!"
+                        subject: "Thurvpn Backend - Build # $env.BUILD_NUMBER - ${currentBuild.currentResult}!"
         }
     }
 }
