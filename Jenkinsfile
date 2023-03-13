@@ -34,9 +34,9 @@ pipeline {
                     echo "Incrementing ${imageName} version..."
                     // NOTE: Please change minor with major or patch, Depends on the Update.
                     sh 'npm version minor --no-git-tag-version'
-                    sh 'chmod +x versionextract.sh'
+                    sh 'chmod +x versionfile.sh'
                     APPL_VERSION = sh(
-                        script: './versionextract.sh',
+                        script: './versionfile.sh',
                         returnStdout: true
                     ).trim()
                     env.imageVersion = "${APPL_VERSION}"
