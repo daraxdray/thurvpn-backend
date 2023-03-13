@@ -26,9 +26,9 @@ def buildImage() {
 
 def deployApp() {
     echo 'deploying the image...'
-    sh 'cat Kubernetes/deployment.yml'
-    sh 'envsubst < kubernetes/deployment.yaml | kubectl apply -f -'
-    sh 'envsubst < kubernetes/service.yaml | kubectl apply -f -'
+    script.sh 'cat /thur_vpn_backend/Kubernetes/deployment.yml'
+    sh 'envsubst < /thur_vpn_backend/kubernetes/deployment.yaml | kubectl apply -f -'
+    sh 'envsubst < /thur_vpn_backend/kubernetes/service.yaml | kubectl apply -f -'
 } 
 
 def commitVisioning() {
