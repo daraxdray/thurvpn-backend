@@ -83,30 +83,30 @@ pipeline {
             }
         }
 
-        stage('Commit Version Update') {
-            when {
-                expression {
-                    BRANCH_NAME == 'prod'
-                }
-            }
-            steps {
-                script {
-                    //Authenticating to git
-                    withCredentials([usernamePassword(
-                        credentialsId: 'gitlab-credentials',
-                        passwordVariable: 'PASS',
-                        usernameVariable: 'USER'
-                    )]){
-                        sh 'git config --global user.email "jenkins@example.com"'
-                        sh 'git config --global user.name "jenkins"'
-                        sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/korsgy-technologies/hosted-solution/thur_vpn_backend.git"
-                        sh 'git add .'
-                        sh 'git commit -m "[ci-skip] Jenkins CI Version Update"'
-                        sh 'git push origin HEAD:prod'
-                    }
-                }
-            }
-        }
+        // stage('Commit Version Update') {
+        //     when {
+        //         expression {
+        //             BRANCH_NAME == 'prod'
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             //Authenticating to git
+        //             withCredentials([usernamePassword(
+        //                 credentialsId: 'gitlab-credentials',
+        //                 passwordVariable: 'PASS',
+        //                 usernameVariable: 'USER'
+        //             )]){
+        //                 sh 'git config --global user.email "jenkins@example.com"'
+        //                 sh 'git config --global user.name "jenkins"'
+        //                 sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/korsgy-technologies/hosted-solution/thur_vpn_backend.git"
+        //                 sh 'git add .'
+        //                 sh 'git commit -m "[ci-skip] Jenkins CI Version Update"'
+        //                 sh 'git push origin HEAD:prod'
+        //             }
+        //         }
+        //     }
+        // }
     }
     post {
         always {
