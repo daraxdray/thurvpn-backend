@@ -27,7 +27,7 @@ const planSchema = new mongoose.Schema({
         required:true
     },
     iapCode: {
-        type:Number,
+        type:String,
         required:true
     },
     active : {
