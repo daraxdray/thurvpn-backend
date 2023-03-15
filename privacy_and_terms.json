@@ -1,0 +1,102 @@
+[
+    
+    { "type":"Privacy",
+    
+    "data":[
+    {
+        "title":"Introduction",
+        "body":"In respect to your use of the Service and your browsing of  the ThurVPN website, Thur VPN's Privacy Policy outlines how the Company handles and protects your personal data and privacy. You accept our Privacy Policy by accepting the current Terms and Conditions and being able to use the Service."
+    },
+   
+    {
+        "title":"Our No-Log Policy",
+        "body":"We take your privacy seriously, which is why we have a strict no-log policy. We do not keep any records of your online activities, so you can rest assured that your browsing history and online behavior remain private and secure."
+    },
+
+    {
+        "title":"Our Data Retention Policy",
+        "body":"We retain your personal information only for as long as necessary to provide you with our VPN service. We securely delete your data once it is no longer needed, and we take all necessary precautions to protect your information from unauthorized access."
+    },
+
+    {
+        "title":"Our Encryption Policy",
+        "body":"We use the highest level of encryption available to protect your data. Our VPN service uses 256-bit AES encryption to ensure that your online activities remain private and secure."
+    },
+
+    {
+        "title":"Our Third-Party Sharing Policy",
+        "body":"We do not share your personal information with third parties without your consent. In some cases, we may need to share your information with third-party service providers to provide you with our VPN service, but we only work with reputable providers who share our commitment to protecting your privacy."
+    },
+
+    {
+        "title":"Our Jurisdiction Policy",
+        "body":"We are based in a country that has strong privacy laws and regulations, and we operate under those laws to protect your personal information. We take all necessary steps to ensure that your data remains secure and protected, and we are committed to transparency about our data handling practices."
+    },
+
+    {
+        "title":"Our Transparency Report",
+        "body":"We are committed to transparency about any requests we receive from governments or law enforcement agencies for user data. We publish regular transparency reports that detail the number and nature of these requests, and we work to minimize the impact of these requests on our users' privacy."
+    }
+    
+    ]},
+
+    { "type": "Terms",
+
+    "data":[
+    {
+        "title":"Introduction",
+
+        "body":"These Terms and Conditions apply to your utilization of this website and Thur VPN, which is a service offered by Korsgy Limitada. All present and future features available through your Thur VPN account are subject to these Terms and Conditions."
+    },
+
+    {
+        "title":"Eligibility",
+
+        "body":" To use this Service, individuals must be at least 13 years old, or must have obtained parental or legal guardian consent if they are minors. The Service is only intended for use by people, and accounts created using automated methods or bots are not permitted and will be terminated. Users are personally responsible for all of their actions related to the use of the Service."
+    },
+
+    {
+        "title":"Policies and prohibitions",
+        "body": {
+            "intro" : "The Company implements several regulations that apply to every user equally, regardless of the type of subscription, in order to prevent its services from being misused, abused, or used to hurt someone. You expressly concur not to use our Service for the following",
+            "prohibited" : [
+                "Accessing, distributing, downloading, or posting illicit content, such as, but not limited to, content that seems to be child porn  or content perceived to be child pornography.",
+                "The act of harassing, abusing, insulting, inflicting injury, defaming, slandering, disparaging, intimidating, or making a distinction on the basis of disability, age, sexual orientation, religion, ethnicity, race, or ethnic group; sending or transferring spam (unsolicited commercial emails) or other types of unsolicited content via the service.",
+                "Attempting to connect to, explore, or access computing devices without the required authority (i.e., 'hacking' in any sense).",
+                "Breaching or infringing upon either our own or third parties' intellectual property rights; promoting criminal activity, giving others the tools to engage in illegal activity, or assisti"
+            ],
+            "outro" : "Any user discovered engaging in any of the aforementioned acts will have their account suspended immediately and without prior notice. You can also be held accountable for any and all losses suffered by the Company as a result of the violation(s), including without limitation any expenses and attorney fees that may have been assessed. Several free accounts are not permitted when using the service. Also, only the actual users of free accounts are permitted to establish and manage them (i.e., it is not permitted to create accounts in someone else's name and then transmit login information to that third party). Also, only the actual users of free accounts are permitted to establish and manage them (i.e., it is not permitted to create accounts in someone else's name and then transmit login information to that third party). Any free account that the Company deems to be abusive in that regard may be subject to action. We have the right to remove or suspend accounts that have not been used for more than a year. Paid accounts that have an active paid status are exempt from this restriction."
+        }
+    },
+
+    {
+        "title":"Warranties and Disclaimers",
+        "body":"Notwithstanding its best efforts, the Company does not guarantee the security of user data or the dependability of the Service. You acknowledge that the Service is provided 'as is' and agree not to hold the Company liable for any damages that may come from the loss of usage, data, or profits related to the performance of the Service or failure in such performance, nor to seek reimbursement from the Company. Any information that you access, download, receive, or purchase while using the Service is not under the Company's control or responsibility, and this includes any software. Furthermore, in the event that confidential information is unintentionally disclosed due to a security flaw or vulnerability in the Service, you agree not to hold the Company accountable or demand indemnity. The Company will make every effort to keep the Service accessible at all times, but there may be variations in VPN service coverage, speeds, server locations, and quality. Data, messages, or page loss, non-delivery, delay, or misdirection as a result of service outages or network or communications service performance difficulties are not the Company's responsibility. At our sole discretion, the Company may set use or service caps, suspend service, or restrict specific types of usage. Thur VPN website may contain links to other websites of interest. External websites are subject to their own terms and conditions and privacy policies, and The Company is not liable for the content of any such websites. The Company may make improvements and changes to the Service at any time without notice. The Company may at its sole discretion terminate service without cause or notice."
+    },
+
+    {
+        "title":"Indemnification",
+        "body":"You agree that the Company and any parents, subsidiaries, officers, employees, or third-party contractors cannot be held responsible for any third-party claim, demand, or damages, including reasonable attorneys' fees, arising out of your use of this Service."
+    },
+
+    {
+        "title":"Terms of payment",
+        "body":"The Company reserves the right to discontinue service immediately if a fraudulent payment is detected, such as the use of a stolen credit card, and such cases may be further referred to the competent authorities."
+    },
+
+    {
+        "title":"Subscription",
+        "body":"You consent to become a subscriber for the chosen duration by signing up for the Service (such as 1 month or 1 year). At the end of the billing term, all plans renew themselves automatically. By default, the renewal term is the same length as the initial subscription's billing term. The Company may suspend your account or remove it after a prolonged period of default if you breach your financial duty as a user of a paid account."
+    },
+    {
+        "title":"Money back guarantee",
+        "body":"Within 30 days after the original purchase date, you may cancel your subscription and receive a full refund. The cancellation and the return request must both be handled within the 30-day window, just to be clear. Please get in touch with us via our support form if you want a refund. The Service offered by the Company are typically non-refundable after the aforementioned 30-day grace period, and any refunds or credits granted will be at the sole discretion of the Company. Just one refund request per user is permitted. The only currency and payment method that the Company is required to reimburse in the original payment's currency. Cash and bank transfer payments are not refundable. Paid Accounts that are canceled due to a breach of these Conditions will forfeit all payments and credits and are not entitled to a refund. Those who have directly subscribed to Thur VPN or Thur Unlimited through Thur’s official channels are the only ones who can use this refund option (website and apps). Please refer to each service's individual refund policy if you signed up for Thur VPN or Thur Unlimited through a third party. Upon request from the account holder, the Company may additionally, in its sole discretion, issue a prorated refund for service fees paid during the time the Service was unavailable or unusable. Refunds will be completed within 14 days of the request, and the Company is only required to do so in the original payment currency and using the original payment method."
+    },
+    {
+        "title":"Terms of service alteration",
+        "body":"The Company maintains the right to review and modify these Terms and Conditions at any time, subject to applicable legislation. You are in charge of keeping up with the Terms and Conditions. You will be deemed to have agreed to the changes if you continue to use the Service after they are made. The Company maintains the right to change the Service at any time and for any reason, including by adding or deleting specific VPN server functions or by updating the software. Limited technical support, upgrades, and updates for the Service may be provided by the Company at its sole discretion. The Company may periodically download and install updates and upgrades automatically in order to improve and develop the Service. In exchange for using the Service, you as the user consent to receiving these updates and improvements. Under the terms of this Agreement, the Company shall have no duty to render assistance or maintain the Services."
+    }
+    ]
+    }
+
+    ]
