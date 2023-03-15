@@ -11,6 +11,7 @@ const usersRouter = require('./routes/users');
 const vpnRouter = require('./routes/vpn');
 const planRouter = require('./routes/plans');
 const purchaseRouter = require('./routes/purchases');
+const settingsRouter = require('./routes/settings');
 
 const app = express();
 
@@ -24,11 +25,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'DELETE, PUT, GET, POST, OPTIONS');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/vpn', authMiddleware, vpnRouter);
+app.use('/api/vpn', vpnRouter);
 app.use('/api/plans', planRouter);
 app.use('/api/purchases',purchaseRouter);
+app.use('/api/settings',settingsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

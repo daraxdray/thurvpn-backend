@@ -3,8 +3,8 @@ const Plan = require('../model/plans');
 exports.createPlan = async(req,res) =>{
     try{
     const {title,description,price,duration} = req.body;
-    if(!title || !description || !price || !duration){
-        return res.status(400).json({message:`Provide a valid ${!title?'Title, ':!description?'Description, ':!price? 'Price, ':!duration?'Duration ':''} field.`, data:[], status: false});
+    if(!title || !description || !price || !duration || !iapCode){
+        return res.status(400).json({message:`Provide a valid ${!title?'Title, ':!description?'Description, ':!price? 'Price, ':!duration?'Duration, ': !iapCode? 'IAP Code, ':''} field.`, data:[], status: false});
     }
 
     const plan = await Plan.create({
