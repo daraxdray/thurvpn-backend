@@ -20,7 +20,9 @@ const userSchema = new mongoose.Schema({
   otpSecret : {
     type : String
   },
-
+  stripeId:{
+    type: String,
+  },
   otpVerified : {
     type : Boolean,
     default : false
