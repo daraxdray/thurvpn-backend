@@ -2,7 +2,7 @@ const User = require('../model/users')
 const Plan = require('../model/plans')
 const speakeasy = require('speakeasy');
 const nodemailer = require('nodemailer');
-
+const Purchase = require('../model/purchases');
 
 exports.registerUser = async (req, res) => {
   try {
@@ -76,31 +76,33 @@ exports.registerUser = async (req, res) => {
               return res.status(400).json({msg : `Email does not exist, please send OTP`, status: false, data:[]})
           }
   
-          //VALIDATE OTP
-          const verified = speakeasy.totp.verify({
-            secret: user.otpSecret,
-            encoding: 'base32',
-            token: token,
-            window: 600000 // time in 5 minutes
-          });
-
-          if (!verified) {
+          //VALIDATE OTP(
+          const verified =  user.otpSecret == token;
+  
+        if (!verified) {
             return res.status(400).json({msg : `Invalid OTP`, status:false,data:[]})
           }
-
          
-          //CHECK ACTIVE SUBSCRIPTION
+
+
+          //HANDLE DEVICES
+          const deviceMap = user.devices ?? new Map();
+
+          //CHECK IF device does not already exist && ACTIVE SUBSCRIPTION 
           if(user.isPremium && (user.devices != null && deviceId in user.devices == false)){
             //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
             const plan = await Plan.findOne({_id:user.activePlan.plan_id});
-            
-            if(plan && (user.devices.size < plan.devices)){
-            
-              const deviceMap = user.devices;
-              
+            console.log(plan.deviceCount)
+            if(plan && (user.devices.size >= plan.deviceCount)){
+              return res.status(400).json({msg : `Maximum device exceeded.`, status: false, data:user.devices})
+            }else{
               deviceMap.set(deviceId,{deviceName:deviceName,deviceId:deviceId})
               user.set('devices',deviceMap)
             }
+          }else{
+            deviceMap.clear();
+            deviceMap.set(deviceId,{deviceName:deviceName,deviceId:deviceId})
+            user.set('devices',deviceMap)
           }
           
           // const subscription = user.updateSubscriptionPlan()
@@ -143,7 +145,7 @@ exports.registerUser = async (req, res) => {
         time: 600000 // time in 5 minutes
       });
   
-      user.otpSecret = secret.base32;
+      user.otpSecret = otp;
       await user.save();
 
       const jwt = user.createJWT()
@@ -190,12 +192,13 @@ exports.getSingleUser = async (req, res) => {
         if (!user) {
             return res.status(400).json({msg : `No user with the provided id`, status: false, data:[]})
         }
+        let purchase = await Purchase.findOne({user_id : userId},).populate('plan_id')
 
-        //GET HOW MANY DAYS OF ACTIVEPLAN 
-        // if(user.activePlan){        
-         
-        //   return res.status(200).json({msg : 'User found',  status: true, data:{user,daysUsed}})
-        // }
+        if(purchase){
+          purchase = purchase.toObject({virtuals:true})
+          const daysLeft = purchase.plan_id.duration - purchase.daysCount;
+          return res.status(200).json({msg : 'User found',  status: true, data:{...user.toObject(),...purchase,daysLeft}}) 
+        }
         return res.status(200).json({msg : 'User found',  status: true, data:user})
     } catch (error) {
         console.log(error)
