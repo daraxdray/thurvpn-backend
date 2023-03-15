@@ -110,7 +110,7 @@ pipeline {
     }
     post {
         always {
-            emailext    body: "${currentBuild.currentResult}: OGC- ${env.imageName} build ${env.BUILD_NUMBER}\n To view the result, check console output for more info at: \n $env.BUILD_URL/console",
+            emailext    body: "${currentBuild.currentResult}: Thurvpn- ${env.imageName} build ${env.BUILD_NUMBER}\n To view the result, check console output for more info at: \n $env.BUILD_URL/console",
                         to: '$DEFAULT_RECIPIENTS',
                         attachLog: true,
                         subject: "Thurvpn Backend - Build # $env.BUILD_NUMBER - ${currentBuild.currentResult}!"
