@@ -188,9 +188,7 @@ exports.getSingleUser = async (req, res) => {
       .json({ message: "User found", status: true, data: user });
   } catch (error) {
     console.log(error);
-    return res
-      .status(401)
-      .json({ message: "Unable to get user data", status: false, data: [] });
+    return failedResponseHandler(error,res);
   }
 };
 exports.getUserDevices = async (req, res) => {
@@ -220,10 +218,7 @@ exports.getUserDevices = async (req, res) => {
       .status(200)
       .json({ message: "User found", status: true, data: user.devices });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(401)
-      .json({ message: "Unable to get user data", status: false, data: [] });
+    return failedResponseHandler(error,res);
   }
 };
 
