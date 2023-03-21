@@ -4,4 +4,5 @@ const {getPvcTc} = require('../controllers/settings')
 
 router.route('/get-pvctc').get(getPvcTc)
 
+
 module.exports = router;

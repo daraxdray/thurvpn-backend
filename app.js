@@ -13,6 +13,7 @@ const vpnRouter = require("./routes/vpn");
 const planRouter = require("./routes/plans");
 const purchaseRouter = require("./routes/purchases");
 const settingsRouter = require("./routes/settings");
+const feedbackRouter = require("./routes/feedback");
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/api/vpn", vpnRouter);
 app.use("/api/plans", planRouter);
 app.use("/api/purchases", purchaseRouter);
 app.use("/api/settings", settingsRouter);
+app.use("/api/feedback", feedbackRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
