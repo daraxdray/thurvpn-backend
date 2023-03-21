@@ -1,5 +1,6 @@
 const Purchase = require("../model/purchases");
 const User = require("../model/users");
+const Plan = require("../model/plans");
 // const stripe = require('stripe')('sk_test_...');
 const PaymentService = require("../services/payment_service");
 const handleStripeWebhookEvent = (req, res) => {
@@ -82,6 +83,29 @@ exports.createPurchase = async (req, res) => {
           message: "Missing or Invlaid parameter(s): " + msg,
         });
     }
+    const user = await User.findOne({_id:userId});
+    
+    if(!user){
+      return res
+      .status(400)
+      .json({
+        data: [],
+        status: false,
+        message: "User does not exist",
+      });
+    }
+    const plan = await Plan.findOne({_id:planId});
+    
+    if(!plan){
+      return res
+      .status(400)
+      .json({
+        data: [],
+        status: false,
+        message: "Plan does not exist",
+      });
+    }
+
 
     const purchaseExist = await Purchase.findOne({ user_id: userId });
     let purchase = null;
