@@ -5,7 +5,6 @@ const nodemailer = require("nodemailer");
 const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
 
-
 exports.loginUser = async (req, res) => {
   try {
     const { email, token, deviceId, deviceName } = req.body;
@@ -53,7 +52,7 @@ exports.loginUser = async (req, res) => {
     ) {
       //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
       const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
-      
+
       if (plan && user.devices.size >= plan.deviceCount) {
         return res.status(400).json({
           message: `Maximum device exceeded.`,
@@ -80,10 +79,9 @@ exports.loginUser = async (req, res) => {
       .status(200)
       .json({ message: "User found", data: { user, jwt }, status: true });
   } catch (error) {
-    return failedResponseHandler(error,res)
+    return failedResponseHandler(error, res);
   }
 };
-
 
 exports.sendOTP = async (req, res) => {
   try {
@@ -149,7 +147,7 @@ exports.sendOTP = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return failedResponseHandler(error,res);
+    return failedResponseHandler(error, res);
   }
 };
 
@@ -168,7 +166,11 @@ exports.getSingleUser = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ message: `No user with the provided id`, status: false, data: [] });
+        .json({
+          message: `No user with the provided id`,
+          status: false,
+          data: [],
+        });
     }
     let purchase = await Purchase.findOne({ user_id: userId }).populate(
       "plan_id"
@@ -176,19 +178,21 @@ exports.getSingleUser = async (req, res) => {
 
     if (purchase) {
       purchase = purchase.toObject({ virtuals: true });
-      const daysLeft = purchase.plan_id.duration - purchase.daysCount;
-      return res.status(200).json({
-        message: "User found",
-        status: true,
-        data: { ...user.toObject(), ...purchase, daysLeft },
-      });
+      if (purchase.plan_id != null) {
+        const daysLeft = purchase.plan_id.duration - purchase.daysCount;
+        return res.status(200).json({
+          message: "User found",
+          status: true,
+          data: { ...user.toObject(), ...purchase, daysLeft },
+        });
+      }
     }
     return res
       .status(200)
       .json({ message: "User found", status: true, data: user });
   } catch (error) {
     console.log(error);
-    return failedResponseHandler(error,res);
+    return failedResponseHandler(error, res);
   }
 };
 exports.getUserDevices = async (req, res) => {
@@ -206,7 +210,11 @@ exports.getUserDevices = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ message: `No user with the provided id`, status: false, data: [] });
+        .json({
+          message: `No user with the provided id`,
+          status: false,
+          data: [],
+        });
     }
 
     //GET HOW MANY DAYS OF ACTIVEPLAN
@@ -218,7 +226,7 @@ exports.getUserDevices = async (req, res) => {
       .status(200)
       .json({ message: "User found", status: true, data: user.devices });
   } catch (error) {
-    return failedResponseHandler(error,res);
+    return failedResponseHandler(error, res);
   }
 };
 
@@ -237,7 +245,7 @@ exports.getAllUsers = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return failedResponseHandler(error,res);
+    return failedResponseHandler(error, res);
   }
 };
 
@@ -273,7 +281,7 @@ exports.updateUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return failedResponseHandler(error,res);
+    return failedResponseHandler(error, res);
   }
 };
 
@@ -300,15 +308,11 @@ exports.deleteUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return failedResponseHandler(error,res);
+    return failedResponseHandler(error, res);
   }
 };
 
-
-
 //****************************ADMIN ROUTES********* */
-
-
 
 exports.adminLogin = async (req, res) => {
   try {
@@ -333,14 +337,13 @@ exports.adminLogin = async (req, res) => {
       });
     }
 
-    
-      const result = await bcrypt.compare(password, user.pwHash);  
-   
-      if (!result) {
-        return res
-          .status(400)
-          .json({ message: `Invalid Password`, status: false, data: [] });
-      }
+    const result = await bcrypt.compare(password, user.pwHash);
+
+    if (!result) {
+      return res
+        .status(400)
+        .json({ message: `Invalid Password`, status: false, data: [] });
+    }
     //create and save session/ device token
     const jwt = user.createJWT();
     user.deviceToken = jwt;
@@ -350,10 +353,9 @@ exports.adminLogin = async (req, res) => {
       .status(200)
       .json({ message: "User found", data: { user, jwt }, status: true });
   } catch (error) {
-    return failedResponseHandler(error,res );
+    return failedResponseHandler(error, res);
   }
 };
-
 
 exports.registerAdmin = async (req, res) => {
   try {
@@ -383,39 +385,37 @@ exports.registerAdmin = async (req, res) => {
         data: [],
       });
     }
-    const hash = await bcrypt.hash(password, 10,)
-      // store hash in the database
+    const hash = await bcrypt.hash(password, 10);
+    // store hash in the database
 
-      if (!hash) {
-        return res.status(400).json({
-          message: "Unable to create password.",
-          status: false,
-          data: [],
-        });
-      }
-
-      const user = await User.create({
-        ...req.body,
-        otpSecret: null,
-        otpVerified: true,
-        pwHash: hash,
+    if (!hash) {
+      return res.status(400).json({
+        message: "Unable to create password.",
+        status: false,
+        data: [],
       });
+    }
 
-      if (!user) {
-        return res.status(400).json({
-          message: "Unable to create user account.",
-          status: false,
-          data: [],
-        });
-      }
+    const user = await User.create({
+      ...req.body,
+      otpSecret: null,
+      otpVerified: true,
+      pwHash: hash,
+    });
 
-      return res.status(201).json({
-        message: "Account created",
-        data: user,
-        status: true,
+    if (!user) {
+      return res.status(400).json({
+        message: "Unable to create user account.",
+        status: false,
+        data: [],
       });
+    }
 
-
+    return res.status(201).json({
+      message: "Account created",
+      data: user,
+      status: true,
+    });
   } catch (error) {
     console.log("The ERR", error);
     return failedResponseHandler(error, res);
