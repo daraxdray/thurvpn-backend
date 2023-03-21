@@ -20,4 +20,5 @@ router.route('/delete-all').delete(deleteAllVpn);
 router.route('/update-region').put(updateRegion)
 router.route('/add-regions').post(addRegions)
 router.route('/add-a-region').post(addSingleRegion)
+router.route('/get-countries').get(getAll)
 module.exports = router;

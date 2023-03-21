@@ -4,6 +4,7 @@ const speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
 const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
+const emailSender = require('../services/mail_service')
 
 exports.loginUser = async (req, res) => {
   try {
@@ -101,9 +102,7 @@ exports.sendOTP = async (req, res) => {
       user = new User({ email: email });
     }
 
-    // if (user.otpVerified) {
-    //   return res.status(400).json({ message: `User has already been verified.` ,data:[],status:false});
-    // }
+    const mailer = new emailSender();
 
     const secret = speakeasy.generateSecret();
 
@@ -117,29 +116,13 @@ exports.sendOTP = async (req, res) => {
     await user.save();
 
     const jwt = user.createJWT();
-
-    /// create reusable transporter object
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "stephen.ignatius@korsgy.com",
-        pass: "tczkonuzmpehzbeg",
-      },
-    });
-
+    const html = `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
+    <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
+    </div>`;
     // send mail with defined transport object
-    let info = await transporter.sendMail({
-      from: '"THURVPN" <youremail@gmail.com>', // sender address
-      to: email, // list of receivers
-      subject: "OTP REQUEST", // Subject line
-      html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
-                <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
-                </div>`, // html body
-    });
-
-    console.log("Message sent: %s", info.messageId);
-
+    let info = await mailer.sendMailTo('"THURVPN" <youremail@gmail.com>',email,"OTP REQUEST",html);
+    
     return res.status(200).json({
       message: "New OTP generated and sent",
       data: { user, otp, jwt },

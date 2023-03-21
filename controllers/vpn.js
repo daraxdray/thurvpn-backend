@@ -1,7 +1,7 @@
 let fs = require("fs");
 let path = require("path");
 let sha1 = require("sha1");
-let os = require("os");
+// let os = require("os");
 
 const vpnModel = require("../model/vpn");
 //import raw jsonArray for countries
@@ -203,7 +203,7 @@ exports.createVpn = async (req, res) => {
     return res
       .status(400)
       .json({
-        data: vpn,
+        data: [],
         status: true,
         message: "Please provide valid regions",
       });
@@ -326,6 +326,31 @@ exports.createMultipleVpn = async (req, res) => {
 exports.getAllVpn = async (req, res) => {
   try {
     const vpns = await vpnModel.find({regions: { $gt:{$size:1}}});
+
+    if (!vpns) {
+      return res
+        .status(400)
+        .json({
+          data: [],
+          status: false,
+          message: "VPN has not been added to the list yet.",
+        });
+    }
+    return res
+      .status(200)
+      .json({
+        data: vpns,
+        status: true,
+        message: "VPN data listed completely",
+      });
+  } catch (error) {
+    return failedResponseHandler(error, res);
+  }
+};
+
+exports.getAll = async (req, res) => {
+  try {
+    const vpns = await vpnModel.find();
 
     if (!vpns) {
       return res
@@ -645,10 +670,6 @@ exports.deleteAllVpn = async (req, res) => {
   }
 };
 
-
-exports.getServerFileContent = async (req,res) =>{
-
-}
 
 
 
