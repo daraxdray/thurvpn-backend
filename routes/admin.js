@@ -13,7 +13,7 @@ const {
 
 
 // router.route("*").get(authAdmin);
-router.route("/all").get(getAllUsers);
+router.route("/get-users").get(getAllUsers);
 router.route("/:id").get(getSingleUser);
 router.route("/get-devices/:id").get(getUserDevices);
 router.route("/:id").put(updateUser);

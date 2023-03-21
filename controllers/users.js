@@ -149,9 +149,7 @@ exports.sendOTP = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(400)
-      .json({ message: "Internal server error...", status: false, data: [] });
+    return failedResponseHandler(error,res);
   }
 };
 
@@ -244,9 +242,7 @@ exports.getAllUsers = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", status: false, data: [] });
+    return failedResponseHandler(error,res);
   }
 };
 
@@ -282,9 +278,7 @@ exports.updateUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", status: false, data: [] });
+    return failedResponseHandler(error,res);
   }
 };
 
@@ -311,9 +305,7 @@ exports.deleteUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", data: [], status: false });
+    return failedResponseHandler(error,res);
   }
 };
 
