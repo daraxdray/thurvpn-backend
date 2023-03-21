@@ -1,63 +1,68 @@
-const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
-
-  username : {
-    type : String,
-    required : false
+  username: {
+    type: String,
+    required: false,
   },
-  name : {
-    type : String,
-    required : false
+  name: {
+    type: String,
+    required: false,
   },
 
   email: {
     type: String,
-    required: true
+    required: true,
   },
+  pwHash:{
+    type: String,
 
-  otpSecret : {
-    type : String
   },
-
-  otpVerified : {
-    type : Boolean,
-    default : false
+  otpSecret: {
+    type: String,
+  },
+  stripeId: {
+    type: String,
+  },
+  otpVerified: {
+    type: Boolean,
+    default: false,
   },
 
   isPremium: {
     type: Boolean,
-    default:false
+    default: false,
   },
   devices: {
-    type:Map,
-    of:Object
-    
+    type: Map,
+    of: Object,
   },
   activePlan: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'Purchase'
+    ref: "Purchase",
   },
-  active:{
+  active: {
     type: Boolean,
-    default: true
+    default: true,
   },
-  
-  isAdmin:{
-    type: Boolean,
-    default: false
-  },
-  deviceToken:{
-    type: String,
-    default:''
-  } 
 
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  deviceToken: {
+    type: String,
+    default: "",
+  },
 });
 
 userSchema.methods.createJWT = function () {
-    return jwt.sign({id : this._id, username : this.username, email : this.email}, process.env.JWT_SECRET)
-}
+  return jwt.sign(
+    { id: this._id, username: this.username, email: this.email },
+    process.env.JWT_SECRET
+  );
+};
 
 // userSchema.pre('save', function (next) {
 //   const currentDate = new Date()
@@ -81,12 +86,12 @@ userSchema.methods.createJWT = function () {
 // })
 
 userSchema.methods.updateSubscriptionPlan = function () {
-  const currentDate = new Date()
+  const currentDate = new Date();
   if (this.subscriptionTimestamp && currentDate > this.subscriptionTimestamp) {
-    this.subscribedPlan = 'none'
-    this.subscriptionTimestamp = null
+    this.subscribedPlan = "none";
+    this.subscriptionTimestamp = null;
   }
-  return this.subscribedPlan
-}
+  return this.subscribedPlan;
+};
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model("User", userSchema);

@@ -111,7 +111,7 @@ exports.getServerFile = async (req, res) => {
 };
 
 exports.createVpn = async (req, res) => {
-  const { country, code, image, regions } = req.body;
+  const { country, code, image, regions, unicode } = req.body;
 
   try {
     if (!country || !code || !image) {
@@ -165,6 +165,7 @@ exports.createVpn = async (req, res) => {
         }
       }
 
+
       if (msg != null) {
         return res
           .status(201)
@@ -181,6 +182,7 @@ exports.createVpn = async (req, res) => {
         country: country,
         countryCode: code,
         countryImage: image,
+        unicode: unicode,
         regions: regions,
       });
 
@@ -253,7 +255,8 @@ exports.createMultipleVpn = async (req, res) => {
               !region.ipAddress ||
               !region.port ||
               !region.filePath ||
-              !region.slug
+              !region.slug ||
+              !region.password
             ) {
               msg =
                 (!region.regionName ? "Region Name, " : "") +
@@ -355,6 +358,7 @@ exports.getVpnById = async (req, res) =>{
         return res.status(400).json({data:[],status:false,message:"Unable to get vpn of provided ID"});
     }
 
+    
     return res.status(200).json({data:{...findVpn.toObject()},status:true,message:"VPN found"});
 
   }catch(error){
@@ -374,7 +378,13 @@ exports.getRegionByQuery = async (req, res) =>{
     if(!region){
       return res.status(400).json({data:[],status:false,message:"Unable to get region with provide query"});
     }
-    return res.status(200).json({data:{...region.toObject(),country:findVpn.country,countryCode:findVpn.countryCode, countryImage:findVpn.countryImage},status:true,message:"Region Found"});
+    //get a .ovpn file, load it as bytes[]
+  const filePath = path.join(__dirname,_path,path.basename(region.filePath));
+
+  //load to memory
+  let file = fs.readFileSync(filePath).toString("utf-8"); 
+
+    return res.status(200).json({data:{...region,country:findVpn.country,countryCode:findVpn.countryCode, countryImage:findVpn.countryImage,content:Buffer.from(file).toString('base64')},status:true,message:"Region Found"});
 
   }catch(error){
     return failedResponseHandler(error,res)
@@ -490,6 +500,7 @@ exports.addRegions = async (req, res) =>{
     return failedResponseHandler(error,res)
   }
 }
+
 
 exports.getVpnByQuery = async (req, res) =>{
   try{  
