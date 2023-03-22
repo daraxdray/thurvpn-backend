@@ -11,14 +11,15 @@ const {
   deleteUser,
   getUserDevices,
   adminLogin,
+  deleteUserDevice,
 } = require("../controllers/users");
 
 router.route("/login").post(loginUser);
 router.route("/send-otp").post(sendOTP);
-
+//ensure delete device comes first
+router.route("/delete-device").delete(deleteUserDevice);
 router.route("/:id").get(getSingleUser);
 router.route("/get-devices/:id").get(getUserDevices);
 router.route("/:id").put(updateUser);
 router.route("/:id").delete(deleteUser);
-
 module.exports = router;

@@ -4,7 +4,7 @@ const speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
 const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
-const emailSender = require('../services/mail_service')
+const emailSender = require("../services/mail_service");
 
 exports.loginUser = async (req, res) => {
   try {
@@ -121,8 +121,13 @@ exports.sendOTP = async (req, res) => {
     <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
     </div>`;
     // send mail with defined transport object
-    let info = await mailer.sendMailTo('"THURVPN" <youremail@gmail.com>',email,"OTP REQUEST",html);
-    
+    let info = await mailer.sendMailTo(
+      '"THURVPN" <youremail@gmail.com>',
+      email,
+      "OTP REQUEST",
+      html
+    );
+
     return res.status(200).json({
       message: "New OTP generated and sent",
       data: { user, otp, jwt },
@@ -147,13 +152,11 @@ exports.getSingleUser = async (req, res) => {
     const user = await User.findOne({ _id: userId }).populate("activePlan");
 
     if (!user) {
-      return res
-        .status(400)
-        .json({
-          message: `No user with the provided id`,
-          status: false,
-          data: [],
-        });
+      return res.status(400).json({
+        message: `No user with the provided id`,
+        status: false,
+        data: [],
+      });
     }
     let purchase = await Purchase.findOne({ user_id: userId }).populate(
       "plan_id"
@@ -178,6 +181,7 @@ exports.getSingleUser = async (req, res) => {
     return failedResponseHandler(error, res);
   }
 };
+
 exports.getUserDevices = async (req, res) => {
   try {
     const { id: userId } = req.params;
@@ -191,13 +195,11 @@ exports.getUserDevices = async (req, res) => {
     const user = await User.findOne({ _id: userId });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({
-          message: `No user with the provided id`,
-          status: false,
-          data: [],
-        });
+      return res.status(400).json({
+        message: `No user with the provided id`,
+        status: false,
+        data: [],
+      });
     }
 
     //GET HOW MANY DAYS OF ACTIVEPLAN
@@ -273,7 +275,9 @@ exports.deleteUser = async (req, res) => {
     const { id: userId } = req.params;
 
     if (!userId) {
-      return res.status(400).json({ error: "Missing user ID" });
+      return res
+        .status(400)
+        .json({ message: "Missing user ID", status: false, data: [] });
     }
 
     const deleteUser = await User.findByIdAndDelete(userId);
@@ -287,6 +291,48 @@ exports.deleteUser = async (req, res) => {
     return res.status(200).json({
       message: "User deleted successfully",
       data: deleteUser,
+      status: true,
+    });
+  } catch (error) {
+    console.log(error);
+    return failedResponseHandler(error, res);
+  }
+};
+
+exports.deleteUserDevice = async (req, res) => {
+  try {
+    const { deviceId, userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: "Missing user ID" });
+    }
+    if (!deviceId) {
+      return res
+        .status(400)
+        .json({ error: "Please provide a deveice ID to delete" });
+    }
+
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User does not exist", data: [], status: false });
+    }
+
+    if (!user.devices.has(deviceId)) {
+      return res
+        .status(400)
+        .json({ message: "Device does not exist", data: [], status: false });
+    }
+
+    user.devices.delete(deviceId);
+    user.set("devices", user.devices);
+
+    await user.save();
+    return res.status(200).json({
+      message: "Device deleted successfully",
+      data: [],
       status: true,
     });
   } catch (error) {
