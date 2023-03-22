@@ -37,6 +37,10 @@ const vpnModel = new mongoose.Schema({
         type:String,
         
     },
+    status: {
+        type:Boolean,
+        default: true
+    },
     regions:{
         type: [],
         default:[]

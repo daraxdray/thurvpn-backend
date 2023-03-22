@@ -41,6 +41,7 @@ const userSchema = new mongoose.Schema({
   activePlan: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Purchase",
+    default:null
   },
   active: {
     type: Boolean,
