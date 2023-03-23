@@ -1,6 +1,6 @@
 const Feedback = require("../model/feedback");
 const User = require("../model/users");
-
+const emailSender = require("../services/mail_service");
 
 
 
@@ -47,6 +47,56 @@ exports.createFeedback = async (req, res) => {
         data: [],
         status: false,
         message: "Unable to submit feedback",
+      });
+  } catch (error) {
+   return failedResponseHandler(error, res);
+  }}
+
+
+  exports.sendReportToMail = async (req, res) => {
+  const { subject, to, body } = req.body;
+
+  try {
+    if (!body || !subject || to == null) {
+      let msg =
+        (!body ? "Body" : "") +
+        (!subject ? ", Subject" : "") +
+        (!to ? ", Email" : "");
+      return res
+        .status(400)
+        .json({
+          data: [],
+          status: false,
+          message: "Missing or Invalid parameter(s): " + msg,
+        });
+    }
+
+    const mailer = new emailSender();
+
+    let sent = await mailer.sendMailTo(
+      null,
+      to,
+      subject,
+      body
+    );
+
+    //if feedback is successfully created or updated
+    if (sent) {
+      
+      return res
+        .status(200)
+        .json({
+          data: sent,
+          status: true,
+          message: "Mail submitted.",
+        });
+    }
+    return res
+      .status(400)
+      .json({
+        data: [],
+        status: false,
+        message: "Unable to send mail",
       });
   } catch (error) {
    return failedResponseHandler(error, res);

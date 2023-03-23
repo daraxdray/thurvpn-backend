@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
         this.service = 'gmail',
         this.user =  "thurvpn@gmail.com",
         this.pass =  "cyosonkokxnuozvh"
+        this.from = '"THURVPN" <thurvpn@gmail.com>'
     }
 
 
@@ -24,7 +25,7 @@ const nodemailer = require('nodemailer');
         if(to == null)return
         
         const resp = await this.initTransport().sendMail({
-            from: from , // sender address
+            from: from ?? this.from , // sender address
             to: to, // list of receivers
             subject: subject, // Subject line
             html: html 
