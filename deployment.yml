@@ -89,5 +89,5 @@ spec:
         value: "back"
         effect: "NoSchedule"
       imagePullSecrets:
-      - name: my-registry-key
+      - name: my-ecr-registry
 

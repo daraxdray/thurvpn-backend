@@ -17,7 +17,7 @@ def buildApp() {
 
 def buildImage() {
       echo "building the docker image..."
-      withCredentials([usernamePassword(credentialsId: 'ecr-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+      withCredentials([usernamePassword(credentialsId: 'thurvpnapi-ecr-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
           sh "docker build -t ${IMAGE_REPO}:${imageVersion} ."
           sh "echo $PASS | docker login -u $USER --password-stdin ${ECR_REPO_URL}"
           sh "docker push ${IMAGE_REPO}:${imageVersion}"
@@ -26,8 +26,8 @@ def buildImage() {
 
 def deployApp() {
     echo 'deploying the image...'
-    sh 'envsubst < kubernetes/deployment.yaml | kubectl apply -f -'
-    sh 'envsubst < kubernetes/service.yaml | kubectl apply -f -'
+    sh 'envsubst < kubernetes/deployment.yml | kubectl apply -f -'
+    sh 'envsubst < kubernetes/service.yml | kubectl apply -f -'
 } 
 
 def commitVisioning() {
@@ -35,11 +35,11 @@ def commitVisioning() {
     echo "Commit current version to GitLab repo"
     withCredentials([usernamePassword(credentialsId: 'gitlab-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
         sh 'git config user.email "jenkins@example.com"'
-        sh 'git config user.name "Jenkins"'
-        sh "git remote set-url origin https://${USER}:${PASS}gitlab.com/korsgy-technologies/hosted-solution/thur_vpn_backend.git"
+        sh 'git config user.name "jenkins"'
+        sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/korsgy-technologies/hosted-solution/thur_vpn_backend.git"
         sh 'git add .'
         sh 'git commit -m "ci: version bump"'
-        sh 'git push origin HEAD:prod'
+        sh 'git push origin HEAD:devops-aws-20230224'
     }
 }
 return this
