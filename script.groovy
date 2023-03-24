@@ -1,4 +1,4 @@
-def Versioning() {
+def versioning() {
     echo "Incrementing version..."
     // NOTE: Please change minor with major or patch, Depends on the Update.
     sh 'npm version patch --no-git-tag-version'
