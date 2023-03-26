@@ -26,8 +26,8 @@ def buildImage() {
 
 def deployApp() {
     echo 'deploying the image...'
-    sh 'envsubst < kubernetes/deployment.yml | kubectl apply -f -'
-    sh 'envsubst < kubernetes/service.yml | kubectl apply -f -'
+    sh 'envsubst < deployment.yml | kubectl apply -f -'
+    sh 'envsubst < service.yml | kubectl apply -f -'
 } 
 
 def commitVisioning() {
