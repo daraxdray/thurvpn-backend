@@ -4,7 +4,7 @@ metadata:
   name: thurvpnapi
   labels:
     app: thurvpnapi
-  namespace: thurvpnapi
+  # namespace: thurvpnapi
 spec:
    type: LoadBalancer 
    ports: 
@@ -23,7 +23,7 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: thurvpnapi-hpa
-  namespace: thurvpnapi
+  # namespace: thurvpnapi
 spec:
   behavior:
     scaleDown:
