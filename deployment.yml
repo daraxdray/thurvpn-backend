@@ -18,7 +18,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: thurvpnapi
-        image: $regName/$imageName:$imageVersion
+        image: $IMAGE_REPO:$imageVersion
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
