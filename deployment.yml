@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: thurvpnapi
-  # namespace: thurvpnapi
   labels:
     app: thurvpnapi
 spec:
@@ -15,79 +14,16 @@ spec:
       labels:
         app: thurvpnapi
     spec:
-      restartPolicy: Always
-      containers:
-      - name: thurvpnapi
-        image: $IMAGE_REPO:$imageVersion
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 3000
-        resources:
-          requests:
-            memory: 115Mi
-            cpu: 100m
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8
-          initialDelaySeconds: 120
-          periodSeconds: 30
-        env:
-        - name: MONGO_URI
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: MONGO_URI
-        - name: DB_NAME
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: DB_NAME
-        - name: PORT
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: PORT
-        - name: GGL_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: GGL_CLIENT_ID
-        - name: GGL_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: GGL_CLIENT_SECRET
-        - name: SESSION_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: SESSION_SECRET
-        - name: FB_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: FB_CLIENT_ID
-        - name: FB_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: FB_CLIENT_SECRET
-        - name: SENDER_MAIL
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: SENDER_MAIL
-        - name: SENDER_PASS
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: SENDER_PASS
-      tolerations:
-      - key: "type"
-        operator: "Equal"
-        value: "back"
-        effect: "NoSchedule"
       imagePullSecrets:
-      - name: my-ecr-registry
-
+        - name: my-ecr-registry
+      containers:
+        - name: thurvpnapi
+          image: $IMAGE_REPO:$imageVersion
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: 115Mi
+              cpu: 100m
+              
