@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: thurvpnapi
+  name: thurvpnapisvc
   labels:
     app: thurvpnapi
 spec:
@@ -10,37 +10,5 @@ spec:
      - name: thurvpnapi
        port: 80
        targetPort: 3000
-     - name: thurvpnapi-ssl
-       port: 443
-       targetPort: 3000
    selector:
      app: thurvpnapi
-
----
-                                                    ### Backend HPA ###
-apiVersion: autoscaling/v2beta2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: thurvpnapi-hpa
-spec:
-  behavior:
-    scaleDown:
-      stabilizationWindowSeconds: 10
-      policies:
-      - type: Percent
-        value: 30
-        periodSeconds: 60
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: thurvpnapi
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: 85
-
