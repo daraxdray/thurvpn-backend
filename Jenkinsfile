@@ -80,17 +80,17 @@ pipeline {
             }
 
         }
-        stage('commit version update') {
-            when {
-                expression {
-                    BRANCH_NAME == 'devops-aws-20230224'
-                }
-            }
-            steps {
-                script {
-                    gv.commitVisioning()
-                }
-            }
+        // stage('commit version update') {
+        //     when {
+        //         expression {
+        //             BRANCH_NAME == 'devops-aws-20230224'
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             gv.commitVisioning()
+        //         }
+        //     }
         }
 
     }
