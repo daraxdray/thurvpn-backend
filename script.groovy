@@ -26,7 +26,7 @@ def buildImage() {
 
 def deployApp() {
     echo 'deploying the image...'
-    sh 'aws eks --region us-west-1 update-kubeconfig --name thurvpnapi-eks-cluster'
+    sh 'aws eks --region us-west-1 update-kubeconfig --name thurvpn'
     sh 'envsubst < deployment.yml | kubectl apply -f -'
     sh 'envsubst < service.yml | kubectl apply -f -'
 } 
