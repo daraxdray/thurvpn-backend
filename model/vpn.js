@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 // const Region = new mongoose.Schema({
 //     ipAddress: {
@@ -9,7 +9,7 @@ const mongoose = require('mongoose')
 //     },
 //     slug: {
 //         type:String
-//     },  
+//     },
 //     regionName: {
 //         type: String,
 //     },
@@ -18,37 +18,36 @@ const mongoose = require('mongoose')
 //     }
 // })
 
-
 const vpnModel = new mongoose.Schema({
-
-    country: {
-        type:String,
-        required:true
-    },
-    countryCode:{
-        type:String,
-        required:true
-    },
-    countryImage:{
-        type:String,
-        required:true
-    },
-    unicode:{
-        type:String,
-        
-    },
-    status: {
-        type:Boolean,
-        default: true
-    },
-    regions:{
-        type: [],
-        default:[]
-    },
-    created_at: { type: Date, default: Date.now },
-    updated_at: { type: Date, default: Date.now }
-
+  country: {
+    type: String,
+    required: true,
+  },
+  countryCode: {
+    type: String,
+    required: true,
+  },
+  countryImage: {
+    type: String,
+    required: true,
+  },
+  unicode: {
+    type: String,
+  },
+  status: {
+    type: Boolean,
+    default: true,
+  },
+  isPremium: {
+    type: Boolean,
+    default: true,
+  },
+  regions: {
+    type: [],
+    default: [],
+  },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
 });
 
-
-module.exports = mongoose.model('Servers',vpnModel);
+module.exports = mongoose.model("Servers", vpnModel);
