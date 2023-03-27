@@ -5,7 +5,7 @@ metadata:
   labels:
     app: thurvpnapi
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: thurvpnapi
@@ -19,9 +19,8 @@ spec:
       - name: my-ecr-registry
       containers:
       - name: thurvpnapi
-        image: $IMAGE_REPO:$imageVersion
+        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:0.0.1
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
----
 
