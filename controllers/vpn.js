@@ -133,7 +133,7 @@ exports.getServerFile = async (req, res) => {
 };
 
 exports.createVpn = async (req, res) => {
-  const { country, code, image, regions, unicode } = req.body;
+  const { country, code, image, regions, unicode, isPremium } = req.body;
 
   try {
     if (!country || !code || !image) {
@@ -198,6 +198,7 @@ exports.createVpn = async (req, res) => {
         countryImage: image,
         unicode: unicode,
         regions: regions,
+        isPremium: isPremium == null ?true: isPremium
       });
 
       if (!vpn) {
@@ -231,7 +232,7 @@ exports.createMultipleVpn = async (req, res) => {
         notAdded = 0;
 
       for (i = 0; i < countries.length; i++) {
-        const { country, code, image, regions, unicode } = countries[i];
+        const { country, code, image, regions, unicode, isPremium } = countries[i];
 
         if (!country || !code || !image) {
           const msg =
@@ -293,6 +294,7 @@ exports.createMultipleVpn = async (req, res) => {
             countryImage: image,
             unicode: unicode,
             regions: regions,
+            isPremium: isPremium == null ?true: isPremium
           });
           added++;
         } else {

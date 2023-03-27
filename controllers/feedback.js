@@ -1,7 +1,7 @@
 const Feedback = require("../model/feedback");
 const User = require("../model/users");
 const emailSender = require("../services/mail_service");
-
+const MAIL_SUPPORT = "support@thurvpn.com";
 
 
 exports.createFeedback = async (req, res) => {
@@ -75,7 +75,7 @@ exports.createFeedback = async (req, res) => {
 
     let sent = await mailer.sendMailTo(
       null,
-      to,
+      MAIL_SUPPORT,
       subject,
       body
     );

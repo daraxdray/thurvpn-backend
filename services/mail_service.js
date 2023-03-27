@@ -6,11 +6,10 @@ const nodemailer = require('nodemailer');
 
     constructor(){
         this.service = 'gmail',
-        this.user =  "thurvpn@gmail.com",
+        this.user =  "support@thurvpn.com",
         this.pass =  "cyosonkokxnuozvh"
-        this.from = '"THURVPN" <thurvpn@gmail.com>'
+        this.from = '"THURVPN" <support@thurvpn.com>'
     }
-
 
     initTransport(){
        return nodemailer.createTransport({
