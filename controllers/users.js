@@ -376,6 +376,7 @@ exports.adminLogin = async (req, res) => {
     //create and save session/ device token
     const jwt = user.createJWT();
     user.deviceToken = jwt;
+    user.isAdmin = true;
     await user.save();
 
     // if(!user.isAdmin){
