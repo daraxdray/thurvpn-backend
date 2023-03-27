@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: thurvpnapi
-  namespace: thurvpnapi
   labels:
     app: thurvpnapi
 spec:
