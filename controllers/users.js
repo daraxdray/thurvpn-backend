@@ -169,7 +169,7 @@ exports.getSingleUser = async (req, res) => {
         return res.status(200).json({
           message: "User found",
           status: true,
-          data: { ...user.toObject(), ...purchase, daysLeft },
+          data: { ...user.toObject(),devices: user.devices, ...purchase, daysLeft },
         });
       }
     }
@@ -378,6 +378,11 @@ exports.adminLogin = async (req, res) => {
     user.deviceToken = jwt;
     await user.save();
 
+    // if(!user.isAdmin){
+    //   return res
+    //     .status(400)
+    //     .json({ message: `Account UnAuthorized`, status: false, data: [] });
+    // }
     return res
       .status(200)
       .json({ message: "User found", data: { user, jwt }, status: true });
@@ -430,6 +435,7 @@ exports.registerAdmin = async (req, res) => {
       otpSecret: null,
       otpVerified: true,
       pwHash: hash,
+      isAdmin:true
     });
 
     if (!user) {

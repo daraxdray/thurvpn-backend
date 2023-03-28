@@ -8,8 +8,15 @@ const nodemailer = require('nodemailer');
         this.service = 'gmail',
         this.user =  "thurvpn@gmail.com",
         this.pass =  "cyosonkokxnuozvh"
-        this.from = '"THURVPN" <thurvpn@gmail.com>'
+        this.from = '"THURVPN" <support@thurvpn.com>'
+
+         // this.host = 'thurvpn.com',
+        // this.port = 465;
+        // this.user =  "support@thurvpn.com",
+        // this.pass =  "ThurVPN!!2023"
+        // this.from = '"THURVPN" <support@thurvpn.com>'
     }
+
 
 
     initTransport(){
