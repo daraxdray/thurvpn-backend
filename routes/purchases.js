@@ -7,7 +7,7 @@ const {createPurchase,getPurchaseById,getPurchaseByUserId,getAllPurchases,create
 
 router.route('/create').post(createPurchase)
 router.route('/get/:purchaseId').get(getPurchaseById)
-router.route('/get-all').get(authAdmin,getAllPurchases)
+router.route('/get-all').get(authAdmin, getAllPurchases)
 router.route('/get-user-purchase/:userId').get(getPurchaseByUserId)
 
 
