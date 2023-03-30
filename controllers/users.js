@@ -49,13 +49,12 @@ exports.loginUser = async (req, res) => {
     //CHECK IF device does not already exist && ACTIVE SUBSCRIPTION
     if (
       user.isPremium &&
-      user.devices != null &&
-      user.devices.has(deviceId) == false
+      user.devices != null
     ) {
       //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
       const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
 
-      if (plan && user.devices.size >= plan.deviceCount) {
+      if (plan && user.devices.size >= plan.deviceCount && user.devices.has(deviceId) == false) {
         return res.status(400).json({
           message: `Maximum device exceeded.`,
           status: false,
