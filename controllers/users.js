@@ -45,11 +45,12 @@ exports.loginUser = async (req, res) => {
     //HANDLE DEVICES
     const deviceMap = user.devices ?? new Map();
 
+    
     //CHECK IF device does not already exist && ACTIVE SUBSCRIPTION
     if (
       user.isPremium &&
       user.devices != null &&
-      deviceId in user.devices == false
+      user.devices.has(deviceId) == false
     ) {
       //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
       const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
