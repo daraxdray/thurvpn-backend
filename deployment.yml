@@ -2,16 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: thurvpnapi
-  labels:
-    app: thurvpnapi
+  namespace: thurvpnapi
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: thurvpnapi
   template:
     metadata:
-      name: thurvpnapi
       labels:
         app: thurvpnapi
     spec:
