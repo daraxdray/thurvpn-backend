@@ -41,6 +41,7 @@ spec:
       port: 443
       targetPort: 3000
   type: LoadBalancer
+    - name: thurvpnapi-loadbalancer
 
 ---   
                                                             ### THURVPN_API HPA ###
