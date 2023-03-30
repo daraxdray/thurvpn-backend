@@ -18,12 +18,7 @@ spec:
           image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
           ports:
             - containerPort: 3000
-          env:
-            - name: MONGODB_URI
-              value: "mongodb+srv://THURVPN:cZpmIJBZMBbrF22j@cluster0.lqtumcd.mongodb.net/?retryWrites=true&w=majority"
-            # - name: API_BASE_URL
-            #   value: "a4411998e830c463d8c9710488954316-1078269471.us-east-1.elb.amazonaws.com"
-
+            
 ---
 apiVersion: v1
 kind: Service
