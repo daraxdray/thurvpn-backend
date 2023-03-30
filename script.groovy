@@ -26,7 +26,7 @@ def buildImage() {
 
 def deployApp() {
     echo 'deploying the image...'
-    sh 'aws eks --region us-west-1 update-kubeconfig --name kkorsgy-eks-cluster-68b07'
+    sh 'aws eks --region us-west-1 update-kubeconfig --name korsgy-eks-cluster-68b07'
     sh 'envsubst < deployment.yml | kubectl apply -f -'
     sh 'envsubst < service.yml | kubectl apply -f -'
 } 
