@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: thurvpn-api-deployment
+  name: thurvpnapi
   namespace: thurvpn
 spec:
   replicas: 2
@@ -55,7 +55,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: thurvpn-api-deployment
+    name: thurvpnapi
   minReplicas: 2
   maxReplicas: 5
   metrics:
