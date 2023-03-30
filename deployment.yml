@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: thurvpnapi
   template:
-    metadata:
+  - metadata:
       labels:
         app: thurvpnapi
     spec:
