@@ -1,7 +1,7 @@
-FROM node:fermium-alpine3.16
+FROM node:16
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
 
@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm install
 RUN npm install moment
 
-COPY . /usr/src/app
+COPY . .
 
 #Assigning the specified port
 EXPOSE 3000
