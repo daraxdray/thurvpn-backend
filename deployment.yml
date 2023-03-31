@@ -32,8 +32,7 @@ metadata:
     app: thurvpnapi
   namespace: thurvpn
 spec:
-   type: LoadBalancer 
-    - thurvpnapi-loadbalancer
+   type: LoadBalancer
    ports: 
      - name: http
        port: 80
