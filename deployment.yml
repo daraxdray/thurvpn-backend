@@ -3,49 +3,47 @@ kind: Deployment
 metadata:
   name: thurvpnapi
   namespace: thurvpn
+  labels:
+    app: thurvpnapi
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: thurvpnapi
   template:
-  - metadata:
+    metadata:
+      name: thurvpnapi
       labels:
         app: thurvpnapi
     spec:
       containers:
-        - name: thurvpnapi-container
-          image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
-          ports:
-          - containerPort: 3000
-          env:
-            - name: MONGODB_URI
-              value: "mongodb+srv://THURVPN:cZpmIJBZMBbrF22j@cluster0.lqtumcd.mongodb.net/?retryWrites=true&w=majority"
-            # - name: API_BASE_URL
-            #   value: "a4411998e830c463d8c9710488954316-1078269471.us-east-1.elb.amazonaws.com"
-
+      - name: thurvpnapi
+        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+      restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: thurvpn-api-service
+  name: thurvpnapisvc
+  labels:
+    app: thurvpnapi
   namespace: thurvpn
 spec:
-  selector:
-    app: thurvpnapi
-  ports:
-    - name: http
-      port: 80
-      targetPort: 3000
-    -name: backend-ssl
-      port: 443
-      targetPort: 3000
-  type: LoadBalancer
-    - name: thurvpnapi-loadbalancer
-
----   
-                                                            ### THURVPN_API HPA ###
-
+   type: LoadBalancer 
+    - thurvpnapi-loadbalancer
+   ports: 
+     - name: http
+       port: 80
+       targetPort: 3000
+     - name: backend-ssl
+       port: 443
+       targetPort: 3000
+   selector:
+     app: thurvpnapi
+---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -64,4 +62,4 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 70
+          averageUtilization: 70  
