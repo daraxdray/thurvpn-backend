@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: thurvpnapi
-        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:0.01
+        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
