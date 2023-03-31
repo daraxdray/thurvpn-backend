@@ -1,7 +1,7 @@
-FROM node:16
+FROM node:fermium-alpine3.16
 
 # Create app directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 
@@ -9,10 +9,10 @@ COPY package*.json ./
 RUN npm install
 RUN npm install moment
 
-COPY . .
+COPY . /usr/src/app
 
 #Assigning the specified port
-EXPOSE 3000
+EXPOSE 2023
 
 #Starting app
 CMD ["npm", "start"]
