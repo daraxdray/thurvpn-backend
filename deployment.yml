@@ -1,36 +1,36 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: thurvpnapi
-  namespace: thurvpn
-  labels:
-    app: thurvpnapi
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: thurvpnapi
-  template:
-    metadata:
-      name: thurvpnapi
-      labels:
-        app: thurvpnapi
-    spec:
-      containers:
-      - name: thurvpnapi
-        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 3000
-      restartPolicy: Always
----
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: thurvpnapi
+#   namespace: thurvpn
+#   labels:
+#     app: thurvpnapi
+# spec:
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: thurvpnapi
+#   template:
+#     metadata:
+#       name: thurvpnapi
+#       labels:
+#         app: thurvpnapi
+#     spec:
+#       containers:
+#       - name: thurvpnapi
+#         image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
+#         imagePullPolicy: Always
+#         ports:
+#         - containerPort: 3000
+#       restartPolicy: Always
+# ---
 apiVersion: v1
 kind: Service
 metadata:
   name: thurvpnapisvc
   labels:
     app: thurvpnapi
-  namespace: thurvpn
+  namespace: thurnamespace
 spec:
    type: LoadBalancer
    ports: 
@@ -40,25 +40,25 @@ spec:
      - name: backend-ssl
        port: 443
        targetPort: 3000
-   selector:
-     app: thurvpnapi
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: thurvpnapi-hpa
-  namespace: thurvpn
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: thurvpnapi
-  minReplicas: 2
-  maxReplicas: 5
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70  
+  #  selector:
+  #    app: thurvpnapi
+# ---
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: thurvpnapi-hpa
+#   namespace: thurvpn
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: thurvpnapi
+#   minReplicas: 2
+#   maxReplicas: 5
+#   metrics:
+#     - type: Resource
+#       resource:
+#         name: cpu
+#         target:
+#           type: Utilization
+#           averageUtilization: 70  
