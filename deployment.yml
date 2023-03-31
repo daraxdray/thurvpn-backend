@@ -1,64 +1,85 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: thurvpnapi
-#   namespace: thurvpn
-#   labels:
-#     app: thurvpnapi
-# spec:
-#   replicas: 2
-#   selector:
-#     matchLabels:
-#       app: thurvpnapi
-#   template:
-#     metadata:
-#       name: thurvpnapi
-#       labels:
-#         app: thurvpnapi
-#     spec:
-#       containers:
-#       - name: thurvpnapi
-#         image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:$imageVersion
-#         imagePullPolicy: Always
-#         ports:
-#         - containerPort: 3000
-#       restartPolicy: Always
-# ---
+                                                    ### Backend Deployment ###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: thurnamespace
+  labels:
+    app: backend-deployment
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: backend-deployment
+  template:
+    metadata:
+      labels:
+        app: backend-deployment
+    spec:    
+      containers:
+      - name: thurvpn-backend
+        image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:0.0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: 125Mi
+        livenessProbe:
+          httpGet:
+            path: /jobs/all
+            port: 80
+            host: 164.90.241.26
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 30
+      restartPolicy: Always
+---
+                                                    ### Backend Service ###
 apiVersion: v1
 kind: Service
 metadata:
-  name: thurvpnapisvc
+  name: backend-service
   labels:
-    app: thurvpnapi
+    app: backend-deployment
   namespace: thurnamespace
 spec:
-   type: LoadBalancer
+   type: LoadBalancer 
    ports: 
-     - name: http
+     - name: backend
        port: 80
        targetPort: 3000
      - name: backend-ssl
        port: 443
        targetPort: 3000
-  #  selector:
-  #    app: thurvpnapi
-# ---
-# apiVersion: autoscaling/v2
-# kind: HorizontalPodAutoscaler
-# metadata:
-#   name: thurvpnapi-hpa
-#   namespace: thurvpn
-# spec:
-#   scaleTargetRef:
-#     apiVersion: apps/v1
-#     kind: Deployment
-#     name: thurvpnapi
-#   minReplicas: 2
-#   maxReplicas: 5
-#   metrics:
-#     - type: Resource
-#       resource:
-#         name: cpu
-#         target:
-#           type: Utilization
-#           averageUtilization: 70  
+   selector:
+     app: backend-deployment
+
+---
+                                                    ### Backend HPA ###
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: thurnamespace
+spec:
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 10
+      policies:
+      - type: Percent
+        value: 30
+        periodSeconds: 60
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend-deployment
+  minReplicas: 6
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 85
