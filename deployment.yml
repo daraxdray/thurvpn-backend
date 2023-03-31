@@ -21,7 +21,7 @@ spec:
         image: 844268948863.dkr.ecr.us-west-1.amazonaws.com/thurvpnapi:0.0.1
         imagePullPolicy: Always
         ports:
-        - containerPort: 3000
+        - containerPort: 2023
         resources:
           requests:
             memory: 125Mi
@@ -48,10 +48,10 @@ spec:
    ports: 
      - name: backend
        port: 80
-       targetPort: 3000
+       targetPort: 2023
      - name: backend-ssl
        port: 443
-       targetPort: 3000
+       targetPort: 2023
    selector:
      app: backend-deployment
 
