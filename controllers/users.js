@@ -46,7 +46,7 @@ exports.loginUser = async (req, res) => {
     const deviceMap = user.devices ?? new Map();
 
     
-    //CHECK IF device does not already exist && ACTIVE SUBSCRIPTION
+    //CHECK IF device does not already exist && ACTIVE SUBSCRIPTIONpdate
     if (
       user.isPremium &&
       user.devices != null

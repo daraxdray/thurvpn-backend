@@ -1,12 +1,12 @@
 const stripe = require("stripe")("sk_test_4eC39HqLyjWDarjtT1zdp7dc");
 
 class PaymentService {
-  getSheet = async ( amount) => {
+  getSheet = async (amount) => {
     // Use an existing Customer ID if this is a returning customer.
-    
-      const customer = await stripe.customers.create();
-      const userStripeId = customer.id;
-    
+
+    const customer = await stripe.customers.create();
+    const userStripeId = customer.id;
+
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: userStripeId },
       { apiVersion: "2022-11-15" }
