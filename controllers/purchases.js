@@ -230,18 +230,20 @@ exports.getPurchaseByUserId = async (req, res) => {
 
 exports.getAllPurchases = async (req, res) => {
   try {
-    const purchases = await Purchase.find({});
+    const purchases = await Purchase.find({})
+    .populate('plan_id')  // populate the 'plan' field using its reference
+    .populate('user_id');
 
     if (![]) {
       return res
         .status(404)
         .json({ message: "No purchase found!", data: null, status: false });
     }
-
+  
     return res
       .status(200)
       .json({
-        data: { count: purchases.length, purchases },
+        data: { count: purchases.length, purchases},
         status: true,
         message: "Purchase listed",
       });
