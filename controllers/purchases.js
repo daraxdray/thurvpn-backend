@@ -40,26 +40,20 @@ const handleStripeWebhookEvent = (req, res) => {
 
 exports.createStripeSheet = async (req, res) => {
   try {
-    const { userId, planId } = req.body;
-    if (!userId || !planId) {
-      let msg = (!userId ? "User id" : "") + (!planId ? ", Plan id" : "");
+    const { amount } = req.body;
+    if (!amount) {
+      let msg = "Amount ";
       return res
         .status(400)
         .json({
           data: [],
           status: false,
-          message: "Missing or Invlaid parameter(s): " + msg,
+          message: "Missing or Invalid parameter(s): " + msg,
         });
     }
     
-    const user = await User.findOne({ _id: userId });
-
-    if(!user){
-      return res.json({data:[],status:false,message:"Unable to identify user account, please use correct user id"});
-    }
-    const sheet = await PaymentService.getSheet(user.stripeId);
-    user.stripeId = sheet.customer;
-    user.save();
+  
+    const sheet = await PaymentService.getSheet(amount);
     res.json({ msg: "Sheet created!", data: sheet, status: true });
   } catch (e) {
     return failedResponseHandler(e, res);
