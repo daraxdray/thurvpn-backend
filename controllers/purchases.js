@@ -40,26 +40,20 @@ const handleStripeWebhookEvent = (req, res) => {
 
 exports.createStripeSheet = async (req, res) => {
   try {
-    const { userId, planId } = req.body;
-    if (!userId || !planId) {
-      let msg = (!userId ? "User id" : "") + (!planId ? ", Plan id" : "");
+    const { amount } = req.body;
+    if (!amount) {
+      let msg = "Amount ";
       return res
         .status(400)
         .json({
           data: [],
           status: false,
-          message: "Missing or Invlaid parameter(s): " + msg,
+          message: "Missing or Invalid parameter(s): " + msg,
         });
     }
     
-    const user = await User.findOne({ _id: userId });
-
-    if(!user){
-      return res.json({data:[],status:false,message:"Unable to identify user account, please use correct user id"});
-    }
-    const sheet = await PaymentService.getSheet(user.stripeId);
-    user.stripeId = sheet.customer;
-    user.save();
+  
+    const sheet = await PaymentService.getSheet(amount);
     res.json({ msg: "Sheet created!", data: sheet, status: true });
   } catch (e) {
     return failedResponseHandler(e, res);
@@ -230,18 +224,20 @@ exports.getPurchaseByUserId = async (req, res) => {
 
 exports.getAllPurchases = async (req, res) => {
   try {
-    const purchases = await Purchase.find({});
+    const purchases = await Purchase.find({})
+    .populate('plan_id')  // populate the 'plan' field using its reference
+    .populate('user_id');
 
     if (![]) {
       return res
         .status(404)
         .json({ message: "No purchase found!", data: null, status: false });
     }
-
+  
     return res
       .status(200)
       .json({
-        data: { count: purchases.length, purchases },
+        data: { count: purchases.length, purchases},
         status: true,
         message: "Purchase listed",
       });

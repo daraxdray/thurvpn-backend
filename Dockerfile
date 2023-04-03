@@ -12,7 +12,7 @@ RUN npm install moment
 COPY . /usr/src/app
 
 #Assigning the specified port
-EXPOSE 3000
+EXPOSE 2023
 
 #Starting app
 CMD ["npm", "start"]
