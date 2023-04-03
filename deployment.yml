@@ -1,25 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: thurvpnapi
+  name: backend-deployment
+  namespace: thurvpn
   labels:
-    app: thurvpnapi
+    app: backend-deployment
 spec:
-  replicas: 2
+  replicas: 6
   selector:
     matchLabels:
-      app: thurvpnapi
+      app: backend-deployment
   template:
     metadata:
       labels:
-        app: thurvpnapi
-    spec:
-      nodeSelector:
-        doks.digitalocean.com/node-pool: "thurvpnapi-pool"
-      restartPolicy: Always
+        app: backend-deployment
+    spec:    
       containers:
-      - name: thurvpnapi
-        image: $regName/$imageName:$imageVersion
+      - name: thurvpn-backend
+        image: $IMAGE_REPO:$imageVersion
         imagePullPolicy: Always
         ports:
-        - containerPort: 3000
+        - containerPort: 2023
+        resources:
+          requests:
+            memory: 125Mi
+        livenessProbe:
+          httpGet:
+            path: /jobs/all
+            port: 80
+            host: 164.90.241.26
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 30
+      restartPolicy: Always
+
