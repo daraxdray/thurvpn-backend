@@ -438,6 +438,66 @@ exports.getRegionByQuery = async (req, res) => {
   }
 };
 
+exports.updateCountry = async (req, res) => {
+  try {
+    const {
+      country,
+      code,
+      image,
+      regions,
+      unicode,
+      premium: isPremium,
+      _id,
+    } = req.body;
+
+    const vp = await vpnModel.findOne({ _id: _id });
+
+    if (!vp) {
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "VPN ID does not exist",
+      });
+    }
+
+    if (country) {
+      vp.country = country;
+    }
+    if (code) {
+      vp.countryCode = code;
+    }
+    if (image) {
+      vp.countryImage = image;
+    }
+    if (regions != null && Array.isArray(regions)) {
+      vp.regions = regions;
+    }
+    if (unicode) {
+      vp.unicode = unicode;
+    }
+    if (isPremium != undefined) {
+      vp.isPremium = isPremium;
+    }
+
+    const saved = await vp.save();
+    if (!saved) {
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to save VPN",
+      });
+    }
+
+    return res.status(200).json({
+      data: saved,
+      status: true,
+      message: "VPN updated successfully",
+    });
+  } catch (error) {
+    return failedResponseHandler(error, res);
+  }
+};
+
 exports.updateRegion = async (req, res) => {
   try {
     const { cc, findBy, regionName, port, ipAddress, filePath, slug } =
@@ -647,60 +707,6 @@ exports.getVpnByQuery = async (req, res) => {
       data: { ...findVpn.toObject() },
       status: true,
       message: "VPN found",
-    });
-  } catch (error) {
-    return failedResponseHandler(error, res);
-  }
-};
-
-exports.updateVpn = async (req, res) => {
-  try {
-    const { country, code, image, regions, id } = req.params;
-
-    if (!id) {
-      return res.status(400).json({
-        data: [],
-        status: false,
-        message: "Please provide vpn id",
-      });
-    }
-
-    const vp = await vpModel.findOne({ _id: id });
-
-    if (!vp) {
-      return res.status(400).json({
-        data: [],
-        status: false,
-        message: "VPN ID does not exist",
-      });
-    }
-
-    if (country) {
-      vp.country = country;
-    }
-    if (code) {
-      vp.countryCode = code;
-    }
-    if (image) {
-      vp.countryImage = image;
-    }
-    if (regions != null && Array.isArray(regions)) {
-      vpn.regions = regions;
-    }
-
-    const saved = await vpn.save();
-    if (!saved) {
-      return res.status(400).json({
-        data: [],
-        status: false,
-        message: "Unable to save VPN",
-      });
-    }
-
-    return res.status(200).json({
-      data: saved,
-      status: true,
-      message: "VPN updated successfully",
     });
   } catch (error) {
     return failedResponseHandler(error, res);
