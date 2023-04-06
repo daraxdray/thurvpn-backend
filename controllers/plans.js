@@ -58,3 +58,27 @@ exports.getAllPlan = async (req, res) => {
         return failedResponseHandler(error,res);
     }
 }
+
+
+exports.deletePlan = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const deleted = await PLan.deleteOne({ _id: id });
+      if (deleted && deleted.deletedCount != 0) {
+        return res.status(200).json({
+          data: deleted,
+          status: true,
+          message: "Plan cleared from documents",
+        });
+      }
+  
+      return res.status(400).json({
+        data: id + ":::",
+        status: false,
+        message: "Unable to delete plan",
+      });
+    } catch (error) {
+      return failedResponseHandler(error, res);
+    }
+  };

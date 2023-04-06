@@ -21,5 +21,5 @@ router.route("/delete-device").delete(deleteUserDevice);
 router.route("/:id").get(getSingleUser);
 router.route("/get-devices/:id").get(getUserDevices);
 router.route("/:id").put(updateUser);
-router.route("/:id").delete(deleteUser);
+router.route("/delete/:id").delete(deleteUser);
 module.exports = router;
