@@ -48,12 +48,16 @@ exports.loginUser = async (req, res) => {
     
     //CHECK IF device does not already exist && ACTIVE SUBSCRIPTIONpdate
     if (
-      user.isPremium &&
-      user.devices != null
+      !user.isPremium 
     ) {
+      deviceMap.clear();
+      deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
+      user.set("devices", deviceMap);
+    } else {
+      // &&
+      // deviceMap.size > 0
       //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
       const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
-
       if (plan && user.devices.size >= plan.deviceCount && user.devices.has(deviceId) == false) {
         return res.status(400).json({
           message: `Maximum device exceeded.`,
@@ -64,10 +68,6 @@ exports.loginUser = async (req, res) => {
         deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
         user.set("devices", deviceMap);
       }
-    } else {
-      deviceMap.clear();
-      deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
-      user.set("devices", deviceMap);
     }
 
     // const subscription = user.updateSubscriptionPlan()
@@ -176,6 +176,41 @@ exports.getSingleUser = async (req, res) => {
     return res
       .status(200)
       .json({ message: "User found", status: true, data: user });
+  } catch (error) {
+    console.log(error);
+    return failedResponseHandler(error, res);
+  }
+};
+
+exports.getLatestDevices = async (req, res) => {
+  try {
+
+    User.find().sort({ createdAt: -1 }).limit(10).exec((err, users) => {
+      if (err) {
+        return res.status(400).json({
+          message: `Unable to process request`,
+          status: false,
+          data: [],
+        });
+      }
+    
+      const devices = [];
+    
+      for (const user of users) {
+        if(user.devices != null){
+          const dvs = user.devices;
+          // console.log(user.toObject().devices.values())
+          devices.push(...user.toObject().devices.values());
+        }
+      }
+
+      return res
+      .status(200)
+      .json({ message: "Devices Listed", status: true, data: devices });
+
+        });
+
+  
   } catch (error) {
     console.log(error);
     return failedResponseHandler(error, res);
