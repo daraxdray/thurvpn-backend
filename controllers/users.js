@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
 const emailSender = require("../services/mail_service");
+const purchases = require("../model/purchases");
 
 exports.loginUser = async (req, res) => {
   try {
@@ -45,11 +46,8 @@ exports.loginUser = async (req, res) => {
     //HANDLE DEVICES
     const deviceMap = user.devices ?? new Map();
 
-    
     //CHECK IF device does not already exist && ACTIVE SUBSCRIPTIONpdate
-    if (
-      !user.isPremium 
-    ) {
+    if (!user.isPremium) {
       deviceMap.clear();
       deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
       user.set("devices", deviceMap);
@@ -58,7 +56,11 @@ exports.loginUser = async (req, res) => {
       // deviceMap.size > 0
       //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
       const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
-      if (plan && user.devices.size >= plan.deviceCount && user.devices.has(deviceId) == false) {
+      if (
+        plan &&
+        user.devices.size >= plan.deviceCount &&
+        user.devices.has(deviceId) == false
+      ) {
         return res.status(400).json({
           message: `Maximum device exceeded.`,
           status: false,
@@ -165,11 +167,25 @@ exports.getSingleUser = async (req, res) => {
     if (purchase) {
       purchase = purchase.toObject({ virtuals: true });
       if (purchase.plan_id != null) {
-        const daysLeft = purchase.plan_id.duration - purchase.daysCount;
+        // get the number of days for the current month
+        const date = new Date();
+        const numOfDays = new Date(date.getFullYear(),date.getMonth()+1,0).getDate() 
+        //extract days left
+        const daysLeft = purchase.plan_id.duration * numOfDays - purchase.daysCount;
+        delete purchase.user_id
+        delete purchase._id
+        delete purchase.id
+
         return res.status(200).json({
           message: "User found",
           status: true,
-          data: { ...user.toObject(),devices: user.devices, ...purchase, daysLeft },
+          data: {
+            id:user._id,
+            ...user.toObject(),
+            daysLeft,
+            devices: user.devices,
+            ... purchase,
+          },
         });
       }
     }
@@ -184,33 +200,32 @@ exports.getSingleUser = async (req, res) => {
 
 exports.getLatestDevices = async (req, res) => {
   try {
-
-    User.find().sort({ createdAt: -1 }).limit(10).exec((err, users) => {
-      if (err) {
-        return res.status(400).json({
-          message: `Unable to process request`,
-          status: false,
-          data: [],
-        });
-      }
-    
-      const devices = [];
-    
-      for (const user of users) {
-        if(user.devices != null){
-          const dvs = user.devices;
-          // console.log(user.toObject().devices.values())
-          devices.push(...user.toObject().devices.values());
+    User.find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .exec((err, users) => {
+        if (err) {
+          return res.status(400).json({
+            message: `Unable to process request`,
+            status: false,
+            data: [],
+          });
         }
-      }
 
-      return res
-      .status(200)
-      .json({ message: "Devices Listed", status: true, data: devices });
+        const devices = [];
 
-        });
+        for (const user of users) {
+          if (user.devices != null) {
+            const dvs = user.devices;
+            // console.log(user.toObject().devices.values())
+            devices.push(...user.toObject().devices.values());
+          }
+        }
 
-  
+        return res
+          .status(200)
+          .json({ message: "Devices Listed", status: true, data: devices });
+      });
   } catch (error) {
     console.log(error);
     return failedResponseHandler(error, res);
@@ -470,7 +485,7 @@ exports.registerAdmin = async (req, res) => {
       otpSecret: null,
       otpVerified: true,
       pwHash: hash,
-      isAdmin:true
+      isAdmin: true,
     });
 
     if (!user) {
