@@ -15,9 +15,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  pwHash:{
+  pwHash: {
     type: String,
-
   },
   otpSecret: {
     type: String,
@@ -41,7 +40,7 @@ const userSchema = new mongoose.Schema({
   activePlan: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Purchase",
-    default:null
+    default: null,
   },
   active: {
     type: Boolean,
@@ -56,6 +55,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
 });
 
 userSchema.methods.createJWT = function () {
@@ -64,6 +65,15 @@ userSchema.methods.createJWT = function () {
     process.env.JWT_SECRET
   );
 };
+
+userSchema.pre("save", function (next) {
+  const now = Date.now();
+  this.updated_at = now;
+  if (!this.created_at) {
+    this.created_at = now;
+  }
+  next();
+});
 
 // userSchema.pre('save', function (next) {
 //   const currentDate = new Date()

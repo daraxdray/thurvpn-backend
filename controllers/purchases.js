@@ -40,26 +40,20 @@ const handleStripeWebhookEvent = (req, res) => {
 
 exports.createStripeSheet = async (req, res) => {
   try {
-    const { userId, planId } = req.body;
-    if (!userId || !planId) {
-      let msg = (!userId ? "User id" : "") + (!planId ? ", Plan id" : "");
+    const { amount } = req.body;
+    if (!amount) {
+      let msg = "Amount ";
       return res
         .status(400)
         .json({
           data: [],
           status: false,
-          message: "Missing or Invlaid parameter(s): " + msg,
+          message: "Missing or Invalid parameter(s): " + msg,
         });
     }
     
-    const user = await User.findOne({ _id: userId });
-
-    if(!user){
-      return res.json({data:[],status:false,message:"Unable to identify user account, please use correct user id"});
-    }
-    const sheet = await PaymentService.getSheet(user.stripeId);
-    user.stripeId = sheet.customer;
-    user.save();
+  
+    const sheet = await PaymentService.getSheet(amount);
     res.json({ msg: "Sheet created!", data: sheet, status: true });
   } catch (e) {
     return failedResponseHandler(e, res);
@@ -247,6 +241,30 @@ exports.getAllPurchases = async (req, res) => {
         status: true,
         message: "Purchase listed",
       });
+  } catch (error) {
+    return failedResponseHandler(error, res);
+  }
+};
+
+
+exports.deletePurchase = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await Purchase.deleteOne({ _id: id });
+    if (deleted && deleted.deletedCount != 0) {
+      return res.status(200).json({
+        data: deleted,
+        status: true,
+        message: "Plan cleared from documents",
+      });
+    }
+
+    return res.status(400).json({
+      data: id + ":::",
+      status: false,
+      message: "Unable to delete plan",
+    });
   } catch (error) {
     return failedResponseHandler(error, res);
   }

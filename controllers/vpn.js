@@ -88,13 +88,11 @@ exports.getServerFile = async (req, res) => {
     const vpn = await vpnModel.findOne({ countryCode: cc.toUpperCase() });
 
     if (!vpn) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get vpn of provided country code",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided country code",
+      });
     }
     let regionIndex = 0;
     const region = vpn.regions.find((rg, index) => {
@@ -102,13 +100,11 @@ exports.getServerFile = async (req, res) => {
       return rg.slug.toLowerCase() == slug.toLowerCase();
     });
     if (!region) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to identify specified region",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to identify specified region",
+      });
     }
     //get a .ovpn file, load it as bytes[]
     const filePath = path.join(
@@ -120,13 +116,11 @@ exports.getServerFile = async (req, res) => {
     //load to memory
     let file = fs.readFileSync(filePath).toString("utf-8");
 
-    return res
-      .status(200)
-      .json({
-        data: { base64: true, content: Buffer.from(file).toString("base64") },
-        status: true,
-        message: "Server loaded",
-      });
+    return res.status(200).json({
+      data: { base64: true, content: Buffer.from(file).toString("base64") },
+      status: true,
+      message: "Server loaded",
+    });
   } catch (e) {
     return failedResponseHandler(e, res);
   }
@@ -194,11 +188,11 @@ exports.createVpn = async (req, res) => {
 
       const vpn = await vpnModel.create({
         country: country,
-        countryCode: code,
+        countryCode: code.toUpperCase(),
         countryImage: image,
         unicode: unicode,
         regions: regions,
-        isPremium: isPremium == null ?true: isPremium
+        isPremium: isPremium == null ? true : isPremium,
       });
 
       if (!vpn) {
@@ -215,7 +209,7 @@ exports.createVpn = async (req, res) => {
 
     return res.status(400).json({
       data: [],
-      status: true,
+      status: false,
       message: "Please provide valid regions",
     });
   } catch (error) {
@@ -232,7 +226,8 @@ exports.createMultipleVpn = async (req, res) => {
         notAdded = 0;
 
       for (i = 0; i < countries.length; i++) {
-        const { country, code, image, regions, unicode, isPremium } = countries[i];
+        const { country, code, image, regions, unicode, isPremium } =
+          countries[i];
 
         if (!country || !code || !image) {
           const msg =
@@ -294,7 +289,7 @@ exports.createMultipleVpn = async (req, res) => {
             countryImage: image,
             unicode: unicode,
             regions: regions,
-            isPremium: isPremium == null ?true: isPremium
+            isPremium: isPremium == null ? true : isPremium,
           });
           added++;
         } else {
@@ -375,22 +370,18 @@ exports.getVpnById = async (req, res) => {
 
     const findVpn = await vpnModel.findOne({ _id: id });
     if (!findVpn) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get vpn of provided ID",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided ID",
+      });
     }
 
-    return res
-      .status(200)
-      .json({
-        data: { ...findVpn.toObject() },
-        status: true,
-        message: "VPN found",
-      });
+    return res.status(200).json({
+      data: { ...findVpn.toObject() },
+      status: true,
+      message: "VPN found",
+    });
   } catch (error) {
     return failedResponseHandler(error, res);
   }
@@ -402,13 +393,11 @@ exports.getRegionByQuery = async (req, res) => {
 
     const findVpn = await vpnModel.findOne({ countryCode: cc.toUpperCase() });
     if (!findVpn) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get vpn of provided ID",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided ID",
+      });
     }
     const region = findVpn.regions.find(
       (rg) =>
@@ -417,13 +406,11 @@ exports.getRegionByQuery = async (req, res) => {
         rg._id == rn
     );
     if (!region) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get region with provide query",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get region with provide query",
+      });
     }
     //get a .ovpn file, load it as bytes[]
     const filePath = path.join(
@@ -435,19 +422,77 @@ exports.getRegionByQuery = async (req, res) => {
     //load to memory
     let file = fs.readFileSync(filePath).toString("utf-8");
 
-    return res
-      .status(200)
-      .json({
-        data: {
-          ...region,
-          country: findVpn.country,
-          countryCode: findVpn.countryCode,
-          countryImage: findVpn.countryImage,
-          content: Buffer.from(file).toString("base64"),
-        },
-        status: true,
-        message: "Region Found",
+    return res.status(200).json({
+      data: {
+        ...region,
+        country: findVpn.country,
+        countryCode: findVpn.countryCode,
+        countryImage: findVpn.countryImage,
+        content: Buffer.from(file).toString("base64"),
+      },
+      status: true,
+      message: "Region Found",
+    });
+  } catch (error) {
+    return failedResponseHandler(error, res);
+  }
+};
+
+exports.updateCountry = async (req, res) => {
+  try {
+    const {
+      country,
+      code,
+      image,
+      regions,
+      unicode,
+      premium: isPremium,
+      _id,
+    } = req.body;
+
+    const vp = await vpnModel.findOne({ _id: _id });
+
+    if (!vp) {
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "VPN ID does not exist",
       });
+    }
+
+    if (country) {
+      vp.country = country;
+    }
+    if (code) {
+      vp.countryCode = code;
+    }
+    if (image) {
+      vp.countryImage = image;
+    }
+    if (regions != null && Array.isArray(regions)) {
+      vp.regions = regions;
+    }
+    if (unicode) {
+      vp.unicode = unicode;
+    }
+    if (isPremium != undefined) {
+      vp.isPremium = isPremium;
+    }
+
+    const saved = await vp.save();
+    if (!saved) {
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to save VPN",
+      });
+    }
+
+    return res.status(200).json({
+      data: saved,
+      status: true,
+      message: "VPN updated successfully",
+    });
   } catch (error) {
     return failedResponseHandler(error, res);
   }
@@ -460,13 +505,11 @@ exports.updateRegion = async (req, res) => {
 
     const findVpn = await vpnModel.findOne({ countryCode: cc.toUpperCase() });
     if (!findVpn) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get vpn of provided country code",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided country code",
+      });
     }
     let regionIndex = 0;
     const region = findVpn.regions.find((rg, index) => {
@@ -478,13 +521,11 @@ exports.updateRegion = async (req, res) => {
       );
     });
     if (!region) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to identify specified region",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to identify specified region",
+      });
     }
     //update region
     if (regionName) {
@@ -506,18 +547,16 @@ exports.updateRegion = async (req, res) => {
     findVpn.regions[regionIndex] = region;
     await findVpn.save();
 
-    return res
-      .status(200)
-      .json({
-        data: {
-          ...region.toObject(),
-          country: findVpn.country,
-          countryCode: findVpn.countryCode,
-          countryImage: findVpn.countryImage,
-        },
-        status: true,
-        message: "Region Found",
-      });
+    return res.status(200).json({
+      data: {
+        ...region.toObject(),
+        country: findVpn.country,
+        countryCode: findVpn.countryCode,
+        countryImage: findVpn.countryImage,
+      },
+      status: true,
+      message: "Region Found",
+    });
   } catch (error) {
     return failedResponseHandler(error, res);
   }
@@ -529,13 +568,11 @@ exports.addSingleRegion = async (req, res) => {
 
     const findVpn = await vpnModel.findOne({ countryCode: cc.toUpperCase() });
     if (!findVpn) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get vpn of provided country code",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided country code",
+      });
     }
 
     if (
@@ -551,13 +588,11 @@ exports.addSingleRegion = async (req, res) => {
         (!region.ipAddress ? "ipAddress, " : "") ||
         (!region.filePath ? "file, " : "") ||
         !region.slug;
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Please ensure regions have required properties: " + msg,
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Please ensure regions have required properties: " + msg,
+      });
     }
     let rIndex = 0;
     //check if region already exist
@@ -574,18 +609,16 @@ exports.addSingleRegion = async (req, res) => {
 
     await findVpn.save();
 
-    return res
-      .status(200)
-      .json({
-        data: {
-          ...region,
-          country: findVpn.country,
-          countryCode: findVpn.countryCode,
-          countryImage: findVpn.countryImage,
-        },
-        status: true,
-        message: "Region Found",
-      });
+    return res.status(200).json({
+      data: {
+        ...region,
+        country: findVpn.country,
+        countryCode: findVpn.countryCode,
+        countryImage: findVpn.countryImage,
+      },
+      status: true,
+      message: "Region Found",
+    });
   } catch (error) {
     return failedResponseHandler(error, res);
   }
@@ -597,13 +630,11 @@ exports.addRegions = async (req, res) => {
 
     const findVpn = await vpnModel.findOne({ countryCode: cc.toUpperCase() });
     if (!findVpn) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get vpn of provided country code",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided country code",
+      });
     }
     if (regions && Array.isArray(regions)) {
       for (i = 0; i < regions.length; i++) {
@@ -622,25 +653,21 @@ exports.addRegions = async (req, res) => {
             (!region.ipAddress ? "ipAddress, " : "") ||
             (!region.filePath ? "file, " : "") ||
             !region.slug;
-          return res
-            .status(400)
-            .json({
-              data: [],
-              status: false,
-              message: "Please ensure regions have required properties: " + msg,
-            });
+          return res.status(400).json({
+            data: [],
+            status: false,
+            message: "Please ensure regions have required properties: " + msg,
+          });
         }
 
         findVpn.regions[i] = region;
       }
       await findVpn.save();
-      return res
-        .status(200)
-        .json({
-          data: { ...findVpn.toObject() },
-          status: true,
-          message: "VPN server regions added",
-        });
+      return res.status(200).json({
+        data: { ...findVpn.toObject() },
+        status: true,
+        message: "VPN server regions added",
+      });
     }
 
     return res
@@ -661,85 +688,25 @@ exports.getVpnByQuery = async (req, res) => {
     } else if (code) {
       findVpn = await vpnModel.findOne({ countryCode: code });
     } else {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "You have not provided any query parameter",
-        });
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "You have not provided any query parameter",
+      });
     }
 
     if (!findVpn) {
-      return res
-        .status(400)
-        .json({
-          data: [],
-          status: false,
-          message: "Unable to get vpn of provided query",
-        });
-    }
-
-    return res
-      .status(200)
-      .json({
-        data: { ...findVpn.toObject() },
-        status: true,
-        message: "VPN found",
-      });
-  } catch (error) {
-    return failedResponseHandler(error, res);
-  }
-};
-
-exports.updateVpn = async (req, res) => {
-  try {
-    const { country, code, image, regions, id } = req.params;
-
-    if (!id) {
       return res.status(400).json({
         data: [],
         status: false,
-        message: "Please provide vpn id",
-      });
-    }
-
-    const vp = await vpModel.findOne({ _id: id });
-
-    if (!vp) {
-      return res.status(400).json({
-        data: [],
-        status: false,
-        message: "VPN ID does not exist",
-      });
-    }
-
-    if (country) {
-      vp.country = country;
-    }
-    if (code) {
-      vp.countryCode = code;
-    }
-    if (image) {
-      vp.countryImage = image;
-    }
-    if (regions != null && Array.isArray(regions)) {
-      vpn.regions = regions;
-    }
-
-    const saved = await vpn.save();
-    if (!saved) {
-      return res.status(400).json({
-        data: [],
-        status: false,
-        message: "Unable to save VPN",
+        message: "Unable to get vpn of provided query",
       });
     }
 
     return res.status(200).json({
-      data: saved,
+      data: { ...findVpn.toObject() },
       status: true,
-      message: "VPN updated successfully",
+      message: "VPN found",
     });
   } catch (error) {
     return failedResponseHandler(error, res);
@@ -748,10 +715,10 @@ exports.updateVpn = async (req, res) => {
 
 exports.deleteVpn = async (req, res) => {
   try {
-    const { id } = req.param;
+    const { id } = req.params;
 
     const deleted = await vpnModel.deleteOne({ _id: id });
-    if (deleted) {
+    if (deleted && deleted.deletedCount != 0) {
       return res.status(200).json({
         data: deleted,
         status: true,
@@ -760,7 +727,7 @@ exports.deleteVpn = async (req, res) => {
     }
 
     return res.status(400).json({
-      data: [],
+      data: id + ":::",
       status: false,
       message: "Unable to delete vpn",
     });
