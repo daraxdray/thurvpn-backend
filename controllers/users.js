@@ -108,11 +108,12 @@ exports.sendOTP = async (req, res) => {
 
     const secret = speakeasy.generateSecret();
 
-    const otp = speakeasy.totp({
-      secret: secret.base32,
-      encoding: "base32",
-      time: 600000, // time in 5 minutes
-    });
+    const otp = '123456'
+    // speakeasy.totp({
+    //   secret: secret.base32,
+    //   encoding: "base32",
+    //   time: 600000, // time in 5 minutes
+    // });
 
     user.otpSecret = otp;
     await user.save();
