@@ -2,8 +2,15 @@ const Plan = require("../model/plans");
 
 exports.createPlan = async (req, res) => {
   try {
-    const { title, description, price, duration } = req.body;
-    if (!title || !description || !price || !duration || !iapCode) {
+    const { title, description, price, duration, features, iapCode } = req.body;
+    if (
+      !title ||
+      !description ||
+      !price ||
+      !duration ||
+      !iapCode ||
+      !features
+    ) {
       return res.status(400).json({
         message: `Provide a valid ${
           !title
@@ -14,6 +21,8 @@ exports.createPlan = async (req, res) => {
             ? "Price, "
             : !duration
             ? "Duration, "
+            : !features
+            ? "Features, "
             : !iapCode
             ? "IAP Code, "
             : ""
@@ -37,7 +46,7 @@ exports.createPlan = async (req, res) => {
     return res.status(200).json({
       message: "Plan created successfully",
       data: plan,
-      status: false,
+      status: true,
     });
   } catch (error) {
     failedResponseHandler(error, res);
@@ -77,7 +86,7 @@ exports.getPlanById = async (req, res) => {
 
 exports.updatePlan = async (req, res) => {
   try {
-    const { planId } = req.body;
+    const { id: planId } = req.body;
 
     if (!planId) {
       return res.status(400).json({
@@ -105,7 +114,7 @@ exports.updatePlan = async (req, res) => {
     return res.status(200).json({
       message: "Plan updated successfully",
       data: plan,
-      status: false,
+      status: true,
     });
   } catch (error) {
     failedResponseHandler(error, res);
@@ -136,7 +145,7 @@ exports.deletePlan = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deleted = await PLan.deleteOne({ _id: id });
+    const deleted = await Plan.deleteOne({ _id: id });
     if (deleted && deleted.deletedCount != 0) {
       return res.status(200).json({
         data: deleted,

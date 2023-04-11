@@ -29,6 +29,7 @@ purchaseSchema.virtual("daysCount").get(function () {
 purchaseSchema.pre("save", function (next) {
   const now = Date.now();
   this.updated_at = now;
+  console.log("SAVING")
   if (!this.created_at) {
     this.created_at = now;
   }
@@ -37,6 +38,7 @@ purchaseSchema.pre("save", function (next) {
 
 purchaseSchema.pre("update", function (next) {
   const now = Date.now();
+  console.log("UDAPITING")
   this.updated_at = now;
   next();
 });

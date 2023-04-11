@@ -105,9 +105,11 @@ exports.createPurchase = async (req, res) => {
     let purchase = null;
     //check if user alreay subscribed and update subscription
     if (purchaseExist) {
+      const now = Date.now();
+
       purchase = await Purchase.findByIdAndUpdate(
         { _id: purchaseExist.id },
-        { plan_id: planId, active: paymentStatus },
+        { plan_id: planId, active: paymentStatus, updated_at:  now},
         { new: true }
       );
     } else {
