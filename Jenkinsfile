@@ -3,7 +3,7 @@ def gv
 
 pipeline {
     agent any
-    tools {nodejs "NodeJS"}
+    tools {nodejs "nodejS"}
 
     environment {
         ECR_REPO_URL = '844268948863.dkr.ecr.us-west-1.amazonaws.com'
@@ -15,7 +15,7 @@ pipeline {
         stage("init") {
             when {
                 expression {
-                    BRANCH_NAME == 'prod'
+                    BRANCH_NAME == 'devops-aws-20230224'
                 }
             }
             steps {
@@ -28,7 +28,7 @@ pipeline {
         stage('Increment Version') {
             when {
                 expression {
-                    BRANCH_NAME == 'prod'
+                    BRANCH_NAME == 'devops-aws-20230224'
                 }
             }
             steps {
@@ -41,7 +41,7 @@ pipeline {
         stage("build app") {
             when {
                 expression {
-                    BRANCH_NAME == 'prod'
+                    BRANCH_NAME == 'devops-aws-20230224'
                 }
             }
             steps {
@@ -53,7 +53,7 @@ pipeline {
         stage("build image") {
             when {
                 expression {
-                    BRANCH_NAME == 'prod'
+                    BRANCH_NAME == 'devops-aws-20230224'
                 }
             }
             steps {
@@ -65,7 +65,7 @@ pipeline {
         stage("deploy") {
             when {
                 expression {
-                    BRANCH_NAME == 'prod'
+                    BRANCH_NAME == 'devops-aws-20230224'
                 }
             }
             environment {
@@ -83,7 +83,7 @@ pipeline {
         // stage('commit version update') {
         //     when {
         //         expression {
-        //             BRANCH_NAME == 'prod'
+        //             BRANCH_NAME == 'devops-aws-20230224'
         //         }
         //     }
         //     steps {
