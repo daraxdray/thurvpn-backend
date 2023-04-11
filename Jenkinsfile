@@ -15,7 +15,7 @@ pipeline {
         stage("init") {
             when {
                 expression {
-                    BRANCH_NAME == 'devops-aws-20230224'
+                    BRANCH_NAME == 'prod'
                 }
             }
             steps {
@@ -28,7 +28,7 @@ pipeline {
         stage('Increment Version') {
             when {
                 expression {
-                    BRANCH_NAME == 'devops-aws-20230224'
+                    BRANCH_NAME == 'prod'
                 }
             }
             steps {
@@ -41,7 +41,7 @@ pipeline {
         stage("build app") {
             when {
                 expression {
-                    BRANCH_NAME == 'devops-aws-20230224'
+                    BRANCH_NAME == 'prod'
                 }
             }
             steps {
@@ -53,7 +53,7 @@ pipeline {
         stage("build image") {
             when {
                 expression {
-                    BRANCH_NAME == 'devops-aws-20230224'
+                    BRANCH_NAME == 'prod'
                 }
             }
             steps {
@@ -65,7 +65,7 @@ pipeline {
         stage("deploy") {
             when {
                 expression {
-                    BRANCH_NAME == 'devops-aws-20230224'
+                    BRANCH_NAME == 'prod'
                 }
             }
             environment {
@@ -83,7 +83,7 @@ pipeline {
         // stage('commit version update') {
         //     when {
         //         expression {
-        //             BRANCH_NAME == 'devops-aws-20230224'
+        //             BRANCH_NAME == 'prod'
         //         }
         //     }
         //     steps {
