@@ -3,7 +3,7 @@ def gv
 
 pipeline {
     agent any
-    tools {nodejs "nodejS"}
+    tools {nodejs "nodejs"}
 
     environment {
         ECR_REPO_URL = '844268948863.dkr.ecr.us-west-1.amazonaws.com'
