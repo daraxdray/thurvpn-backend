@@ -20,7 +20,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({
         message: `Please provide all the required parameters: ${msg}`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -30,7 +30,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({
         message: `Email does not exist, please send OTP`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -64,7 +64,7 @@ exports.loginUser = async (req, res) => {
         return res.status(400).json({
           message: `Maximum device exceeded.`,
           status: false,
-          data: user.devices,
+          data: user.devices
         });
       } else {
         deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
@@ -94,7 +94,7 @@ exports.sendOTP = async (req, res) => {
       return res.status(400).json({
         message: `Please provide your email address.`,
         data: [],
-        status: false,
+        status: false
       });
     }
 
@@ -108,7 +108,7 @@ exports.sendOTP = async (req, res) => {
 
     const secret = speakeasy.generateSecret();
 
-    const otp = '123456'
+    const otp = "123456";
     // speakeasy.totp({
     //   secret: secret.base32,
     //   encoding: "base32",
@@ -134,7 +134,7 @@ exports.sendOTP = async (req, res) => {
     return res.status(200).json({
       message: "New OTP generated and sent",
       data: { user, otp, jwt },
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log(error);
@@ -158,7 +158,7 @@ exports.getSingleUser = async (req, res) => {
       return res.status(400).json({
         message: `No user with the provided id`,
         status: false,
-        data: [],
+        data: []
       });
     }
     let purchase = await Purchase.findOne({ user_id: userId }).populate(
@@ -170,23 +170,28 @@ exports.getSingleUser = async (req, res) => {
       if (purchase.plan_id != null) {
         // get the number of days for the current month
         const date = new Date();
-        const numOfDays = new Date(date.getFullYear(),date.getMonth()+1,0).getDate() 
+        const numOfDays = new Date(
+          date.getFullYear(),
+          date.getMonth() + 1,
+          0
+        ).getDate();
         //extract days left
-        const daysLeft = purchase.plan_id.duration * numOfDays - purchase.daysCount;
-        delete purchase.user_id
-        delete purchase._id
-        delete purchase.id
+        const daysLeft =
+          purchase.plan_id.duration * numOfDays - purchase.daysCount;
+        delete purchase.user_id;
+        delete purchase._id;
+        delete purchase.id;
 
         return res.status(200).json({
           message: "User found",
           status: true,
           data: {
-            id:user._id,
+            id: user._id,
             ...user.toObject(),
             daysLeft,
             devices: user.devices,
-            ... purchase,
-          },
+            ...purchase
+          }
         });
       }
     }
@@ -209,7 +214,7 @@ exports.getLatestDevices = async (req, res) => {
           return res.status(400).json({
             message: `Unable to process request`,
             status: false,
-            data: [],
+            data: []
           });
         }
 
@@ -249,7 +254,7 @@ exports.getUserDevices = async (req, res) => {
       return res.status(400).json({
         message: `No user with the provided id`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -277,7 +282,7 @@ exports.getAllUsers = async (req, res) => {
     return res.status(200).json({
       data: { count: users.length, users },
       status: true,
-      message: "User listed",
+      message: "User listed"
     });
   } catch (error) {
     console.log(error);
@@ -297,7 +302,7 @@ exports.updateUser = async (req, res) => {
     delete req.body.email; //removes email object
     const updateUser = await User.findByIdAndUpdate({ _id: userId }, req.body, {
       new: true,
-      runValidators: true,
+      runValidators: true
     });
 
     if (!updateUser) {
@@ -313,7 +318,7 @@ exports.updateUser = async (req, res) => {
     return res.status(201).json({
       message: "User data updated successfully",
       updateUser,
-      subscription,
+      subscription
     });
   } catch (error) {
     console.log(error);
@@ -342,7 +347,7 @@ exports.deleteUser = async (req, res) => {
     return res.status(200).json({
       message: "User deleted successfully",
       data: deleteUser,
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log(error);
@@ -384,7 +389,7 @@ exports.deleteUserDevice = async (req, res) => {
     return res.status(200).json({
       message: "Device deleted successfully",
       data: [],
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log(error);
@@ -403,7 +408,7 @@ exports.adminLogin = async (req, res) => {
       return res.status(400).json({
         message: `Please provide all the required parameters: ${msg}`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -413,7 +418,7 @@ exports.adminLogin = async (req, res) => {
       return res.status(400).json({
         message: `Email does not exist, please try again with a different email`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -450,14 +455,14 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: "Please provide your email address.",
         status: false,
-        data: [],
+        data: []
       });
     }
     if (!password) {
       return res.status(400).json({
         message: "Please provide your password.",
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -467,7 +472,7 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: "User with the email you supplied already exists.",
         status: false,
-        data: [],
+        data: []
       });
     }
     const hash = await bcrypt.hash(password, 10);
@@ -477,7 +482,7 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: "Unable to create password.",
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -486,21 +491,21 @@ exports.registerAdmin = async (req, res) => {
       otpSecret: null,
       otpVerified: true,
       pwHash: hash,
-      isAdmin: true,
+      isAdmin: true
     });
 
     if (!user) {
       return res.status(400).json({
         message: "Unable to create user account.",
         status: false,
-        data: [],
+        data: []
       });
     }
 
     return res.status(201).json({
       message: "Account created",
       data: user,
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log("The ERR", error);
