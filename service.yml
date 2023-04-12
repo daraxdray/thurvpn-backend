@@ -5,7 +5,7 @@ metadata:
   name: backend-service
   labels:
     app: backend-deployment
-  namespace: thurvpn
+  # namespace: thurvpn
 spec:
    type: LoadBalancer 
    ports: 
@@ -24,7 +24,7 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: backend-hpa
-  namespace: thurvpn
+  # namespace: thurvpn
 spec:
   behavior:
     scaleDown:
