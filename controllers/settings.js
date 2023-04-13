@@ -35,7 +35,7 @@ exports.getDashboardData = async (req,res)=>{
           if(user.devices != null){
             const dvs = user.devices;
             // console.log(user.toObject().devices.values())
-            devices.push(...user.toObject().devices.values());
+            devices.push(...user.toObject().devices);
           }
         }
         

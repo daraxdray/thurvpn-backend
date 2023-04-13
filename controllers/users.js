@@ -6,7 +6,7 @@ const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
 const emailSender = require("../services/mail_service");
 const purchases = require("../model/purchases");
-const moment = require('moment')
+const moment = require("moment");
 exports.loginUser = async (req, res) => {
   try {
     const { email, token, deviceId, deviceName } = req.body;
@@ -43,37 +43,31 @@ exports.loginUser = async (req, res) => {
         .json({ message: `Invalid OTP`, status: false, data: [] });
     }
 
-    //HANDLE DEVICES
-    const deviceMap = user.devices ?? new Map();
 
-    //CHECK IF device does not already exist && ACTIVE SUBSCRIPTIONpdate
-    if (!user.isPremium) {
-      deviceMap.clear();
-      deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
-      user.set("devices", deviceMap);
-    } else {
-      // &&
-      // deviceMap.size > 0
-      //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
-      const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
-      if (
-        plan &&
-        user.devices.size >= plan.deviceCount &&
-        user.devices.has(deviceId) == false
-      ) {
-        return res.status(400).json({
-          message: `Maximum device exceeded.`,
-          status: false,
-          data: user.devices
-        });
-      } else {
-        deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
-        user.set("devices", deviceMap);
+    //NEW IMPLEMENTATION
+    const arrDevices = user.devices ?? [];
+    if(arrDevices && Array.isArray(arrDevices)){
+
+      if(!user.isPremium){
+        arrDevices.length = 0;
+        user.devices = [{ deviceName: deviceName, deviceId: deviceId }]
+      }else{
+        const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
+        const dvExist = arrDevices.find((dv)=> dv.deviceId == deviceId);
+    
+        //check if plan exist && devices list is equal/above subscription and user device is not contained
+        if(plan && arrDevices.length >= plan.deviceCount && dvExist){
+          return res.status(400).json({
+            message: `Maximum device exceeded.`,
+            status: false,
+            data: user.devices
+          }); 
+        }else{
+          arrDevices.push({ deviceName: deviceName, deviceId: deviceId });
+          user.devices = arrDevices;
+        }
       }
     }
-
-    // const subscription = user.updateSubscriptionPlan()
-    //create and save session/ device token
     const jwt = user.createJWT();
     user.deviceToken = jwt;
     await user.save();
@@ -97,7 +91,7 @@ exports.sendOTP = async (req, res) => {
         status: false
       });
     }
-
+ 
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -111,7 +105,7 @@ exports.sendOTP = async (req, res) => {
     const otp = speakeasy.totp({
       secret: secret.base32,
       encoding: "base32",
-      time: 600000, // time in 5 minutes
+      time: 600000 // time in 5 minutes
     });
 
     user.otpSecret = otp;
@@ -168,17 +162,16 @@ exports.getSingleUser = async (req, res) => {
       purchase = purchase.toObject({ virtuals: true });
       if (purchase.plan_id != null) {
         // get the number of days for the current month
-        const date = new Date();
-        const numOfDays = date.getDate();
 
         //extract days left
         const endDate = moment(purchase.expire_at);
         const startDate = moment();
         const daysLeft = endDate.diff(startDate, "days");
-        
+
         delete purchase.user_id;
         delete purchase._id;
         delete purchase.id;
+        delete purchase.expire_at;
 
         return res.status(200).json({
           message: "User found",
@@ -222,7 +215,7 @@ exports.getLatestDevices = async (req, res) => {
           if (user.devices != null) {
             const dvs = user.devices;
             // console.log(user.toObject().devices.values())
-            devices.push(...user.toObject().devices.values());
+            devices.push(...user.toObject().devices);
           }
         }
 
@@ -283,7 +276,7 @@ exports.getAllUsers = async (req, res) => {
       message: "User listed"
     });
   } catch (error) {
-    console.log(error);
+    
     return failedResponseHandler(error, res);
   }
 };
@@ -374,15 +367,14 @@ exports.deleteUserDevice = async (req, res) => {
         .json({ message: "User does not exist", data: [], status: false });
     }
 
-    if (!user.devices.has(deviceId)) {
+    if (!user.devices.find((dv) => dv.deviceId == deviceId)) {
       return res
         .status(400)
         .json({ message: "Device does not exist", data: [], status: false });
     }
 
-    user.devices.delete(deviceId);
-    user.set("devices", user.devices);
-
+    user.devices.filter((dv)=> dv.deviceId !== deviceId);
+    
     await user.save();
     return res.status(200).json({
       message: "Device deleted successfully",

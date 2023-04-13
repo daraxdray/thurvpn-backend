@@ -3,6 +3,9 @@ const User = require("../model/users");
 const Plan = require("../model/plans");
 // const stripe = require('stripe')('sk_test_...');
 const PaymentService = require("../services/payment_service");
+const moment = require("moment");
+
+
 const handleStripeWebhookEvent = (req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
@@ -175,7 +178,11 @@ exports.getPurchaseById = async (req, res) => {
     }
 
     purchase = purchase.toObject({ virtuals: true });
-    const daysLeft = purchase.plan_id.duration - purchase.daysCount;
+       //extract days left
+       const endDate = moment(purchase.expire_at);
+       const startDate = moment();
+       const daysLeft = endDate.diff(startDate, "days");
+  
     return res
       .status(200)
       .json({
@@ -215,7 +222,11 @@ exports.getPurchaseByUserId = async (req, res) => {
         });
     }
     purchase = purchase.toObject({ virtuals: true });
-    const daysLeft = purchase.plan_id.duration - purchase.daysCount;
+     //extract days left
+     const endDate = moment(purchase.expire_at);
+     const startDate = moment();
+     const daysLeft = endDate.diff(startDate, "days");
+
     return res
       .status(200)
       .json({

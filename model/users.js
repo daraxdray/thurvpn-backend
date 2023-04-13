@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   devices: {
-    type: Map,
+    type: Array,
     of: Object,
   },
   activePlan: {
