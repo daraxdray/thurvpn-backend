@@ -6,7 +6,7 @@ const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
 const emailSender = require("../services/mail_service");
 const purchases = require("../model/purchases");
-
+const moment = require('moment')
 exports.loginUser = async (req, res) => {
   try {
     const { email, token, deviceId, deviceName } = req.body;
@@ -170,14 +170,13 @@ exports.getSingleUser = async (req, res) => {
       if (purchase.plan_id != null) {
         // get the number of days for the current month
         const date = new Date();
-        const numOfDays = new Date(
-          date.getFullYear(),
-          date.getMonth() + 1,
-          0
-        ).getDate();
+        const numOfDays = date.getDate();
+
         //extract days left
-        const daysLeft =
-          purchase.plan_id.duration * numOfDays - purchase.daysCount;
+        const endDate = moment(purchase.expire_at);
+        const startDate = moment();
+        const daysLeft = endDate.diff(startDate, "days");
+        
         delete purchase.user_id;
         delete purchase._id;
         delete purchase.id;

@@ -6,7 +6,10 @@ const Purchase = require("../model/purchases");
 const Vpn = require("../model/vpn");
 
 exports.getPvcTc = (req,res)=>{
-    return res.json(require('../pvctc.json'));
+  const date = new Date();
+  const file = require('../pvctc.json');
+  file.updated_at = date;
+    return res.json(file);
 }
 
 

@@ -6,6 +6,7 @@ const logger = require("morgan");
 const connecDB = require("./db/connect");
 const { authMiddleware, authAdmin } = require("./middleware/authentication");
 
+//ROUTES
 const indexRouter = require("./routes");
 const usersRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
@@ -18,14 +19,15 @@ const feedbackRouter = require("./routes/feedback");
 const app = express();
 
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "fronts"));
+console.log("THE PATH",path.join(__dirname, "fronts"));
 app.set("view engine", "jade");
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname,"public")));
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", req.headers.origin);
