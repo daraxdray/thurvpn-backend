@@ -20,7 +20,6 @@ const app = express();
 
 // view engine setup
 app.set("views", path.join(__dirname, "fronts"));
-console.log("THE PATH",path.join(__dirname, "fronts"));
 app.set("view engine", "jade");
 
 app.use(logger("dev"));

@@ -43,26 +43,24 @@ exports.loginUser = async (req, res) => {
         .json({ message: `Invalid OTP`, status: false, data: [] });
     }
 
-
     //NEW IMPLEMENTATION
     const arrDevices = user.devices ?? [];
-    if(arrDevices && Array.isArray(arrDevices)){
-
-      if(!user.isPremium){
+    if (arrDevices && Array.isArray(arrDevices)) {
+      if (!user.isPremium) {
         arrDevices.length = 0;
-        user.devices = [{ deviceName: deviceName, deviceId: deviceId }]
-      }else{
+        user.devices = [{ deviceName: deviceName, deviceId: deviceId }];
+      } else {
         const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
-        const dvExist = arrDevices.find((dv)=> dv.deviceId == deviceId);
-    
+        const dvExist = arrDevices.find((dv) => dv.deviceId == deviceId);
+
         //check if plan exist && devices list is equal/above subscription and user device is not contained
-        if(plan && arrDevices.length >= plan.deviceCount && dvExist){
+        if (plan && arrDevices.length >= plan.deviceCount && dvExist) {
           return res.status(400).json({
             message: `Maximum device exceeded.`,
             status: false,
             data: user.devices
-          }); 
-        }else{
+          });
+        } else {
           arrDevices.push({ deviceName: deviceName, deviceId: deviceId });
           user.devices = arrDevices;
         }
@@ -91,7 +89,7 @@ exports.sendOTP = async (req, res) => {
         status: false
       });
     }
- 
+
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -118,7 +116,7 @@ exports.sendOTP = async (req, res) => {
     </div>`;
     // send mail with defined transport object
     let info = await mailer.sendMailTo(
-      '"THURVPN" <youremail@gmail.com>',
+      '"THURVPN" <support@thurvpn.com>',
       email,
       "OTP REQUEST",
       html
@@ -276,7 +274,6 @@ exports.getAllUsers = async (req, res) => {
       message: "User listed"
     });
   } catch (error) {
-    
     return failedResponseHandler(error, res);
   }
 };
@@ -373,8 +370,8 @@ exports.deleteUserDevice = async (req, res) => {
         .json({ message: "Device does not exist", data: [], status: false });
     }
 
-    user.devices.filter((dv)=> dv.deviceId !== deviceId);
-    
+   user.devices = user.devices.filter((dv) => dv.deviceId !== deviceId);
+
     await user.save();
     return res.status(200).json({
       message: "Device deleted successfully",

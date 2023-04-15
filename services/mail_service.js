@@ -10,6 +10,10 @@ const nodemailer = require('nodemailer');
         this.pass =  "cyosonkokxnuozvh"
         this.from = '"THURVPN" <support@thurvpn.com>'
 
+
+        // this.user =  "noreply@thurvpn.com",
+        // this.pass =  "Tile4266taco"
+        // this.from = '"THURVPN" <support@thurvpn.com>'
          // this.host = 'thurvpn.com',
         // this.port = 465;
         // this.user =  "support@thurvpn.com",
