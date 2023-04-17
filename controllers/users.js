@@ -61,7 +61,7 @@ exports.loginUser = async (req, res) => {
             data: user.devices
           });
         } else {
-          arrDevices.push({ deviceName: deviceName, deviceId: deviceId });
+          if(!dvExist) arrDevices.push({ deviceName: deviceName, deviceId: deviceId });
           user.devices = arrDevices;
         }
       }
