@@ -27,6 +27,11 @@ const vpnModel = new mongoose.Schema({
     type: String,
     required: true,
   },
+  continent:{
+    type: String,
+    default:'Europe',
+    enum: ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'South America', 'Australia/Oceania'],
+  },
   countryImage: {
     type: String,
     required: true,

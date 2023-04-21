@@ -78,6 +78,46 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+exports.createUser = async (req, res) => {
+  try {
+    const { email, devices } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: `Please provide your email address.`,
+        data: [],
+        status: false
+      });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({
+        message: `User email already exist.`,
+        data: [],
+        status: false
+      });
+    }
+
+    user = new User({ email: email });
+    if(devices && Array.isArray(devices)){
+      user.devices = devices;
+    }
+    await user.save();
+
+   
+
+    return res.status(200).json({
+      message: "User account created",
+      data: { user, },
+      status: true
+    });
+  } catch (error) {
+    console.log(error);
+    return failedResponseHandler(error, res);
+  }
+};
 exports.sendOTP = async (req, res) => {
   try {
     const { email } = req.body;
@@ -280,7 +320,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const { id: userId } = req.params;
+    const {_id: userId } = req.body;
 
     if (!userId) {
       return res
@@ -288,25 +328,25 @@ exports.updateUser = async (req, res) => {
         .json({ message: "Missing user ID", data: [], status: false });
     }
     delete req.body.email; //removes email object
-    const updateUser = await User.findByIdAndUpdate({ _id: userId }, req.body, {
+    const user = await User.findByIdAndUpdate({ _id: userId }, req.body, {
       new: true,
       runValidators: true
     });
 
-    if (!updateUser) {
+    if (!user) {
       return res
         .status(404)
         .json({ message: "User does not exist", data: [], status: false });
     }
 
-    const subscription = updateUser.updateSubscriptionPlan();
+    const subscription = user.updateSubscriptionPlan();
 
-    await updateUser.save(); // save the updated user object to the database
+    await user.save(); // save the updated user object to the database
 
     return res.status(201).json({
       message: "User data updated successfully",
-      updateUser,
-      subscription
+      data: { user, },
+      status: true
     });
   } catch (error) {
     console.log(error);
