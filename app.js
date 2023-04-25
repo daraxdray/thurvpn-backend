@@ -33,7 +33,7 @@ app.use(function (req, res, next) {
     return res.json({
       data: [],
       status: false,
-      message: "Please provide credentials required to use api."
+      message: "Please provide required credentials to use api."
     });
   }
   res.header("Access-Control-Allow-Origin", req.headers.origin);

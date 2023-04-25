@@ -15,7 +15,10 @@ const planSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-
+  imageUrl:{
+    type: String,
+    default:''
+  },
   duration: {
     type: Number,
     required: true,
