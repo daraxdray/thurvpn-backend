@@ -1,48 +1,44 @@
+const nodemailer = require("nodemailer");
 
-const nodemailer = require('nodemailer');
+module.exports = class EmailServer {
+  constructor() {
+    // (this.service = "gmail"), (this.from = '"THURVPN" <noreply@thurvpn.com>');
+    // (this.user = "noreply@thurvpn.com"), (this.pass = "kdmnmqaommgpsasf");
+    (this.service = "gmail"),(this.from = '"THURVPN" <support@thurvpn.com>');
+    // this.pass =  "bEd3Wq4Y3iAhLJ5" //noreply pass
+    this.user =  "thurvpn@gmail.com",
+    this.pass =  "cyosonkokxnuozvh"
 
+    // this.from = '"THURVPN" <support@thurvpn.com>'
+    // this.host = 'thurvpn.com',
+    // this.port = 465;
+    // this.user =  "support@thurvpn.com",
+    // this.pass =  "ThurVPN!!2023"
+    // this.from = '"THURVPN" <support@thurvpn.com>'
+  }
 
- module.exports =  class EmailServer {
+  initTransport() {
+    return nodemailer.createTransport({
+      service: this.service,
+      host:'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: this.user,
+        pass: this.pass
+      }
+    });
+  }
 
-    constructor(){
-        this.service = 'gmail',
-        this.user =  "thurvpn@gmail.com",
-        this.pass =  "cyosonkokxnuozvh"
-        this.from = '"THURVPN" <support@thurvpn.com>'
+  async sendMailTo(from = null, to = null, subject, html) {
+    if (to == null) return;
 
-
-        // this.user =  "noreply@thurvpn.com",
-        // this.pass =  "Tile4266taco"
-        // this.from = '"THURVPN" <support@thurvpn.com>'
-         // this.host = 'thurvpn.com',
-        // this.port = 465;
-        // this.user =  "support@thurvpn.com",
-        // this.pass =  "ThurVPN!!2023"
-        // this.from = '"THURVPN" <support@thurvpn.com>'
-    }
-
-
-
-    initTransport(){
-       return nodemailer.createTransport({
-            service : this.service,
-            auth : {
-                user: this.user,
-                pass:this.pass
-            }
-    }) }
-
-    async sendMailTo(from = null, to = null, subject,html){
-        if(to == null)return
-        
-        const resp = await this.initTransport().sendMail({
-            from: from ?? this.from , // sender address
-            to: to, // list of receivers
-            subject: subject, // Subject line
-            html: html 
-            });
-            return resp;
-    }
-
-}
-
+    const resp = await this.initTransport().sendMail({
+      from: from ?? this.from, // sender address
+      to: to, // list of receivers
+      subject: subject, // Subject line
+      html: html
+    });
+    return resp;
+  }
+};

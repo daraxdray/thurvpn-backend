@@ -156,7 +156,7 @@ exports.sendOTP = async (req, res) => {
     </div>`;
     // send mail with defined transport object
     let info = await mailer.sendMailTo(
-      '"THURVPN" <support@thurvpn.com>',
+      '"THURVPN" <noreply@thurvpn.com>',
       email,
       "OTP REQUEST",
       html

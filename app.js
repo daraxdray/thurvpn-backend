@@ -26,9 +26,16 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(function (req, res, next) {
+  if (req.headers["ssk"] == null || req.headers["ssk"] != process.env.SSK) {
+    return res.json({
+      data: [],
+      status: false,
+      message: "Please provide credentials required to use api."
+    });
+  }
   res.header("Access-Control-Allow-Origin", req.headers.origin);
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST, OPTIONS");
