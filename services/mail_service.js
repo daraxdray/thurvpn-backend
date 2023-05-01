@@ -20,9 +20,10 @@ module.exports = class EmailServer {
   initTransport() {
     return nodemailer.createTransport({
       service: this.service,
-      host:'smtp.gmail.com',
+      host: "smtp.gmail.com",
       port: 465,
       secure: true,
+      debug: true,
       auth: {
         user: this.user,
         pass: this.pass
@@ -33,12 +34,18 @@ module.exports = class EmailServer {
   async sendMailTo(from = null, to = null, subject, html) {
     if (to == null) return;
 
-    const resp = await this.initTransport().sendMail({
-      from: from ?? this.from, // sender address
-      to: to, // list of receivers
-      subject: subject, // Subject line
-      html: html
-    });
+    const resp = await this.initTransport().sendMail(
+      {
+        from: from ?? this.from, // sender address
+        to: to, // list of receivers
+
+        subject: subject, // Subject line
+        html: html
+      },
+      function (err, res) {
+        if (err) console.log(err);
+      }
+    );
     return resp;
   }
 };
