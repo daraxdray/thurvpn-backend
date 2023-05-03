@@ -4,9 +4,12 @@ const speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
 const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
-const emailSender = require("../services/mail_service");
+const emailSender = require("../services/mail/mail_service");
 const purchases = require("../model/purchases");
 const moment = require("moment");
+const htmlTemplate = require('../services/mail/mail_template');
+
+
 exports.loginUser = async (req, res) => {
   try {
     const { email, token, deviceId, deviceName } = req.body;
@@ -153,16 +156,18 @@ exports.sendOTP = async (req, res) => {
     await user.save();
 
     const jwt = user.createJWT();
-    const html = `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
-    <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
-    <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
-    </div>`;
+    const msg = "To complete your login, enter the one-time password (OTP)";
+    
+    // const html = `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
+    // <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
+    // <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
+    // </div>`;
     // send mail with defined transport object
     let info = await mailer.sendMailTo(
       '"THURVPN" <noreply@thurvpn.com>',
       email,
       "OTP REQUEST",
-      html
+      htmlTemplate(msg, '', otp)
     );
 
     return res.status(200).json({

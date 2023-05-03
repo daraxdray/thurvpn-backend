@@ -3,12 +3,14 @@ const nodemailer = require("nodemailer");
 module.exports = class EmailServer {
   constructor() {
     // (this.service = "gmail"), (this.from = '"THURVPN" <noreply@thurvpn.com>');
-    // (this.user = "noreply@thurvpn.com"), (this.pass = "kdmnmqaommgpsasf");
+    // (this.user = "noreply@thurvpn.com"), 
+    // (this.pass = "kdmnmqaommgpsasf");
+    // (this.pass = "kdmnmqaommgpsasf");
     (this.service = "gmail"),(this.from = '"THURVPN" <support@thurvpn.com>');
-    // this.pass =  "bEd3Wq4Y3iAhLJ5" //noreply pass
+    this.pass =  "bEd3Wq4Y3iAhLJ5" //noreply pass
     this.user =  "thurvpn@gmail.com",
     this.pass =  "cyosonkokxnuozvh"
-
+    // kecewkxqebrusbkq
     // this.from = '"THURVPN" <support@thurvpn.com>'
     // this.host = 'thurvpn.com',
     // this.port = 465;
@@ -16,18 +18,22 @@ module.exports = class EmailServer {
     // this.pass =  "ThurVPN!!2023"
     // this.from = '"THURVPN" <support@thurvpn.com>'
   }
-
+  
   initTransport() {
     return nodemailer.createTransport({
       service: this.service,
-      host: "smtp.gmail.com",
+      host: "smpt.gmail.com",
       port: 465,
       secure: true,
-      debug: true,
+      ssl:true,
       auth: {
         user: this.user,
         pass: this.pass
       }
+    },(err,succ)=>{
+      if(err)console.log(err)
+
+      console.log(succ)
     });
   }
 
