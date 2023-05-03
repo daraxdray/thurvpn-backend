@@ -107,8 +107,8 @@ const htmlTemplate = (body, name, otp)=>  `<!DOCTYPE html>
                             <tr>
                                 <td style="padding: 30px 30px 20px">
                                     <p style="margin-bottom: 10px; font-size: large;text-align:center"><strong>${name != ''? name: 'One-Time Password (OTP)'}</strong></p>
-                                    <div style="margin: 0 auto; width: 300px;">
-                                        <img src="https://i.im.ge/2023/05/04/UokKCK.Enter-OTP-cuate.png" width="300"/>
+                                    <div style="margin: 0 auto; width: 300px; text-align:center">
+                                        <img src="https://i.im.ge/2023/05/04/UokKCK.Enter-OTP-cuate.png" width="220"/>
                                     </div>
                                     <p style="margin-bottom: 4px; text-align: center;">${body}: <h1 style="text-align: center;">${otp}</h1></p>
                                     
