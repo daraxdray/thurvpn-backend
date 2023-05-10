@@ -1,5 +1,5 @@
 
 /* GET home page. */
 exports.index = (req, res) => {
-    res.render('index', { title: 'Express' });
+          return res.status(200).json({ data:[],message: "Welcome to thurvpn v1" });
 }

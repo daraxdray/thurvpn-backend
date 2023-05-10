@@ -27,7 +27,8 @@ app.set("view engine", "jade");
 var corsOptions = {
   origin: [
     "http://localhost:3000",
-    "https://admin.thurvpn.com"
+    "https://admin.thurvpn.com",
+    
   ],
   credentials: true,
   methods: "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS",
@@ -48,7 +49,7 @@ app.use(function (req, res, next) {
       message: "Please provide required credentials to use api."
     });
   }
-  res.header("Access-Control-Allow-Origin", 'http://localhost:3000');
+  res.header("Access-Control-Allow-Origin", req.header.origin);
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST, OPTIONS");
   res.header(
