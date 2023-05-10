@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const connecDB = require("./db/connect");
 const { authMiddleware, authAdmin } = require("./middleware/authentication");
+const cors = require("cors");
 
 //ROUTES
 const indexRouter = require("./routes");
@@ -22,11 +23,22 @@ const app = express();
 app.set("views", path.join(__dirname, "fronts"));
 app.set("view engine", "jade");
 
+//
+var corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "https://admin.thurvpn.com"
+  ],
+  credentials: true,
+  methods: "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS",
+};
+app.use(cors(corsOptions))
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
 
 app.use(function (req, res, next) {
   if (req.headers["ssk"] == null || req.headers["ssk"] != process.env.SSK) {
@@ -36,7 +48,7 @@ app.use(function (req, res, next) {
       message: "Please provide required credentials to use api."
     });
   }
-  res.header("Access-Control-Allow-Origin", '*');
+  res.header("Access-Control-Allow-Origin", 'http://localhost:3000');
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST, OPTIONS");
   res.header(
