@@ -36,7 +36,7 @@ app.use(function (req, res, next) {
       message: "Please provide required credentials to use api."
     });
   }
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Origin", '*');
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST, OPTIONS");
   res.header(

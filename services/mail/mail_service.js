@@ -8,14 +8,14 @@ module.exports = class EmailServer {
     // (this.pass = "kdmnmqaommgpsasf");
     (this.service = "gmail"),(this.from = '"THURVPN" <support@thurvpn.com>');
     this.pass =  "bEd3Wq4Y3iAhLJ5" //noreply pass
-    this.user =  "thurvpn@gmail.com",
+    // this.user =  "thurvpn@gmail.com",
     this.pass =  "cyosonkokxnuozvh"
     // kecewkxqebrusbkq
     // this.from = '"THURVPN" <support@thurvpn.com>'
     // this.host = 'thurvpn.com',
     // this.port = 465;
-    // this.user =  "support@thurvpn.com",
-    // this.pass =  "ThurVPN!!2023"
+    this.user =  "support@thurvpn.com",
+    this.pass =  "ThurVPN!!2023"
     // this.from = '"THURVPN" <support@thurvpn.com>'
   }
   
