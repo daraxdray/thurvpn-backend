@@ -456,7 +456,13 @@ exports.adminLogin = async (req, res) => {
         data: []
       });
     }
-
+    if(!user.isAdmin){
+      return res.status(400).json({
+        message: `You are not permitted to use this application`,
+        status: false,
+        data: []
+      });
+    }
     const result = await bcrypt.compare(password, user.pwHash);
 
     if (!result) {
