@@ -2,14 +2,16 @@ const nodemailer = require("nodemailer");
 
 module.exports = class EmailServer {
   constructor() {
+    (this.service = "gmail"),(this.from = '"THURVPN" <support@thurvpn.com>');
+    // this.user =  "thurvpn@gmail.com",
+    // this.pass =  "cyosonkokxnuozvh"
+    this.user =  "thurvpn@korsgy.com",
+    this.pass =  "ldecirupgpzgepew"
     // (this.service = "gmail"), (this.from = '"THURVPN" <noreply@thurvpn.com>');
     // (this.user = "noreply@thurvpn.com"), 
     // (this.pass = "kdmnmqaommgpsasf");
     // (this.pass = "kdmnmqaommgpsasf");
-    (this.service = "gmail"),(this.from = '"THURVPN" <support@thurvpn.com>');
     // this.pass =  "bEd3Wq4Y3iAhLJ5" //noreply pass
-    this.user =  "thurvpn@gmail.com",
-    this.pass =  "cyosonkokxnuozvh"
     // kecewkxqebrusbkq
     // this.from = '"THURVPN" <support@thurvpn.com>'
     // this.host = 'thurvpn.com',
