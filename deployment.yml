@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-deployment
-  namespace: thurvpn
+  # namespace: thurvpn
   labels:
     app: backend-deployment
 spec:

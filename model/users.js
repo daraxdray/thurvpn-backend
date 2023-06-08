@@ -6,11 +6,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  name: {
-    type: String,
-    required: false,
-  },
-
   email: {
     type: String,
     required: true,
@@ -24,17 +19,12 @@ const userSchema = new mongoose.Schema({
   stripeId: {
     type: String,
   },
-  otpVerified: {
-    type: Boolean,
-    default: false,
-  },
-
   isPremium: {
     type: Boolean,
     default: false,
   },
   devices: {
-    type: Map,
+    type: Array,
     of: Object,
   },
   activePlan: {
@@ -46,7 +36,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-
   isAdmin: {
     type: Boolean,
     default: false,
