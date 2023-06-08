@@ -1,113 +1,116 @@
 #!/usr/bin/env groovy
-//Shared library
-library identifier: 'korsgy-shared-library-main@master', retriever: modernSCM(
-        [$class: 'GitSCMSource',
-         remote: 'https://gitlab.com/korsgy-technologies/korsgy-shared-library-main.git',
-         credentialsId: 'gitlab-credentials'
-        ]
-)
-
+def gv
 
 pipeline {
     agent any
-    tools {
-        nodejs 'NodeJS'
-    }
+    tools {nodejs "nodejs"}
+
     environment {
-        regDomain           = 'registry.digitalocean.com'
-        regName             = "${regDomain}/ogc-reg"
-        registryCredentials = 'do-api-token'
-        imageName           = 'thurvpnapi'
-        clusterAPI          = 'DOKS-API-URL'
-        clusterCredentials  = 'thurvpnapi-config'
+        ECR_REPO_URL = '844268948863.dkr.ecr.us-west-1.amazonaws.com'
+        IMAGE_NAME = 'thurvpnapi'
+        IMAGE_REPO = "${ECR_REPO_URL}/${IMAGE_NAME}"
     }
+
     stages {
+        stage("init") {
+            when {
+                expression {
+                    BRANCH_NAME == 'devops-aws-20230224'
+                }
+            }
+            steps {
+                script {
+                    gv = load "script.groovy"
+                }
+            }
+        }
 
         stage('Increment Version') {
             when {
                 expression {
-                    BRANCH_NAME == 'prod'
+                    BRANCH_NAME == 'devops-aws-20230224'
                 }
             }
             steps {
                 script {
-                    echo "Incrementing ${imageName} version..."
-                    // NOTE: Please change minor with major or patch, Depends on the Update.
-                    sh 'npm version minor --no-git-tag-version'
-                    sh 'chmod +x versionfile.sh'
-                    APPL_VERSION = sh(
-                        script: './versionfile.sh',
-                        returnStdout: true
-                    ).trim()
-                    env.imageVersion = "${APPL_VERSION}"
-                }
-            }
-        }
-        stage('Build Image') {
-            when {
-                expression {
-                    BRANCH_NAME == 'prod'
-                }
-            }
-            steps {
-                script {
-                    dockerLogin(env.registryCredentials , env.regName)
-                    dockerBuild(env.regName , env.imageName , env.imageVersion)
-                }
-            }
-        }
-        stage('Push Image') {
-            when {
-                expression {
-                    BRANCH_NAME == 'prod'
-                }
-            }
-            steps {
-                script {
-                   dockerPush(env.regName , env.imageName , env.imageVersion)
-                }
-            }
-        }
-        stage('Deploy to K8S Cluster') {
-            when {
-                expression {
-                    BRANCH_NAME == 'prod'
-                }
-            }
-            steps {
-                script {
-                    withCredentials([string(credentialsId: "${clusterAPI}", variable: 'url')]) {
-                        kubeDeploy(env.regName , env.imageName , env.imageVersion , env.clusterCredentials, "${url}") 
-                    }
+                    gv.versioning()
                 }
             }
         }
 
-        // stage('Commit Version Update') {
+        stage("build app") {
+            when {
+                expression {
+                    BRANCH_NAME == 'devops-aws-20230224'
+                }
+            }
+            steps {
+                script {
+                    gv.buildApp()
+                }
+            }
+        }
+        stage("build image") {
+            when {
+                expression {
+                    BRANCH_NAME == 'devops-aws-20230224'
+                }
+            }
+            steps {
+                script {
+                    gv.buildImage()
+                }
+            }
+        }
+
+        stage("Push Image to ECR"){
+            when {
+                expression {
+                    BRANCH_NAME == 'devops-aws-20230224'
+                }
+            }
+
+                steps {
+                    script {
+                        gv.pushImage()
+                    }
+            }
+
+        }
+
+        stage("deploy") {
+            when {
+                expression {
+                    BRANCH_NAME == 'devops-aws-20230224'
+                }
+            }
+            environment {
+                AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
+                AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
+                AWS_DEFAULT_REGION = "us-west-1"
+            }
+            steps {
+                script {
+                    gv.deployApp()
+                }
+            }
+
+        }
+        // stage('commit version update') {
         //     when {
         //         expression {
-        //             BRANCH_NAME == 'prod'
+        //             BRANCH_NAME == 'devops-aws-20230224'
         //         }
         //     }
         //     steps {
         //         script {
-        //             //Authenticating to git
-        //             withCredentials([usernamePassword(
-        //                 credentialsId: 'gitlab-credentials',
-        //                 passwordVariable: 'PASS',
-        //                 usernameVariable: 'USER'
-        //             )]){
-        //                 sh 'git config --global user.email "jenkins@example.com"'
-        //                 sh 'git config --global user.name "jenkins"'
-        //                 sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/korsgy-technologies/hosted-solution/thur_vpn_backend.git"
-        //                 sh 'git add .'
-        //                 sh 'git commit -m "[ci-skip] Jenkins CI Version Update"'
-        //                 sh 'git push origin HEAD:prod'
-        //             }
+        //             gv.commitVisioning()
         //         }
         //     }
         // }
+
     }
+    
     post {
         always {
             emailext    body: "${currentBuild.currentResult}: Thurvpn- ${env.imageName} build ${env.BUILD_NUMBER}\n To view the result, check console output for more info at: \n $env.BUILD_URL/console",
@@ -117,4 +120,3 @@ pipeline {
         }
     }
 }
-
