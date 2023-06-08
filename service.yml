@@ -1,15 +1,14 @@
-                                                    ### Backend Service ###
 apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
   labels:
     app: backend-deployment
-  # namespace: thurvpn
+  namespace: thurvpn
 spec:
    type: LoadBalancer 
    ports: 
-     - name: backend
+     - name: thurvpn-backend
        port: 80
        targetPort: 2023
      - name: backend-ssl
@@ -19,12 +18,12 @@ spec:
      app: backend-deployment
 
 ---
-                                                    ### Backend HPA ###
+                                                    ### HPA ###
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: backend-hpa
-  # namespace: thurvpn
+  namespace: thurvpn
 spec:
   behavior:
     scaleDown:
@@ -37,8 +36,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: backend-deployment
-  minReplicas: 6
-  maxReplicas: 20
+  minReplicas: 1
+  maxReplicas: 2
   metrics:
     - type: Resource
       resource:
