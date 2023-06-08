@@ -6,7 +6,10 @@ const Purchase = require("../model/purchases");
 const Vpn = require("../model/vpn");
 
 exports.getPvcTc = (req,res)=>{
-    return res.json(require('../pvctc.json'));
+  const date = new Date();
+  const file = require('../pvctc.json');
+  file.updated_at = date;
+    return res.json(file);
 }
 
 
@@ -32,7 +35,7 @@ exports.getDashboardData = async (req,res)=>{
           if(user.devices != null){
             const dvs = user.devices;
             // console.log(user.toObject().devices.values())
-            devices.push(...user.toObject().devices.values());
+            devices.push(...user.toObject().devices);
           }
         }
         

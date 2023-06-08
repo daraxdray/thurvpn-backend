@@ -5,7 +5,9 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const connecDB = require("./db/connect");
 const { authMiddleware, authAdmin } = require("./middleware/authentication");
+const cors = require("cors");
 
+//ROUTES
 const indexRouter = require("./routes");
 const usersRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
@@ -18,22 +20,43 @@ const feedbackRouter = require("./routes/feedback");
 const app = express();
 
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "fronts"));
 app.set("view engine", "jade");
 
+//
+var corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "https://admin.thurvpn.com",
+    
+  ],
+  credentials: true,
+  methods: "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS",
+};
+app.use(cors(corsOptions))
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  if (req.headers["ssk"] == null || req.headers["ssk"] != process.env.SSK) {
+    return res.json({
+      data: [],
+      status: false,
+      message: "Please provide required credentials to use api."
+    });
+  }
+  console.log(req.headers.origin);
+  res.header("Access-Control-Allow-Origin", '*');
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization, ssk"
+
   );
   next();
 });

@@ -1,6 +1,6 @@
 const Feedback = require("../model/feedback");
 const User = require("../model/users");
-const emailSender = require("../services/mail_service");
+const emailSender = require("../services/mail/mail_service");
 const MAIL_SUPPORT = "support@thurvpn.com";
 
 

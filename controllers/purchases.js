@@ -3,6 +3,9 @@ const User = require("../model/users");
 const Plan = require("../model/plans");
 // const stripe = require('stripe')('sk_test_...');
 const PaymentService = require("../services/payment_service");
+const moment = require("moment");
+
+
 const handleStripeWebhookEvent = (req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
@@ -74,7 +77,7 @@ exports.createPurchase = async (req, res) => {
         .json({
           data: [],
           status: false,
-          message: "Missing or Invlaid parameter(s): " + msg,
+          message: "Missing or Invalid parameter(s): " + msg,
         });
     }
     const user = await User.findOne({_id:userId});
@@ -102,6 +105,9 @@ exports.createPurchase = async (req, res) => {
 
 
     const purchaseExist = await Purchase.findOne({ user_id: userId });
+    const regDate = new Date();
+    const expire = new Date(regDate.getFullYear(),regDate.getMonth()+plan.duration, regDate.getDate());
+    console.log(expire);
     let purchase = null;
     //check if user alreay subscribed and update subscription
     if (purchaseExist) {
@@ -109,7 +115,10 @@ exports.createPurchase = async (req, res) => {
 
       purchase = await Purchase.findByIdAndUpdate(
         { _id: purchaseExist.id },
-        { plan_id: planId, active: paymentStatus, updated_at:  now},
+        { plan_id: planId, active: 
+          paymentStatus, updated_at:  now,
+          expire_at:expire
+        },
         { new: true }
       );
     } else {
@@ -117,6 +126,7 @@ exports.createPurchase = async (req, res) => {
         user_id: userId,
         plan_id: planId,
         active: paymentStatus,
+        expire_at: expire
       });
     }
     //if purchase is successfully created or updated
@@ -168,7 +178,11 @@ exports.getPurchaseById = async (req, res) => {
     }
 
     purchase = purchase.toObject({ virtuals: true });
-    const daysLeft = purchase.plan_id.duration - purchase.daysCount;
+       //extract days left
+       const endDate = moment(purchase.expire_at);
+       const startDate = moment();
+       const daysLeft = endDate.diff(startDate, "days");
+  
     return res
       .status(200)
       .json({
@@ -208,7 +222,11 @@ exports.getPurchaseByUserId = async (req, res) => {
         });
     }
     purchase = purchase.toObject({ virtuals: true });
-    const daysLeft = purchase.plan_id.duration - purchase.daysCount;
+     //extract days left
+     const endDate = moment(purchase.expire_at);
+     const startDate = moment();
+     const daysLeft = endDate.diff(startDate, "days");
+
     return res
       .status(200)
       .json({

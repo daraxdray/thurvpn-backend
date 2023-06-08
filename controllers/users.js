@@ -4,8 +4,11 @@ const speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
 const Purchase = require("../model/purchases");
 const bcrypt = require("bcrypt");
-const emailSender = require("../services/mail_service");
+const emailSender = require("../services/mail/mail_service");
 const purchases = require("../model/purchases");
+const moment = require("moment");
+const htmlTemplate = require('../services/mail/mail_template');
+
 
 exports.loginUser = async (req, res) => {
   try {
@@ -20,7 +23,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({
         message: `Please provide all the required parameters: ${msg}`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -30,7 +33,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({
         message: `Email does not exist, please send OTP`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -43,37 +46,29 @@ exports.loginUser = async (req, res) => {
         .json({ message: `Invalid OTP`, status: false, data: [] });
     }
 
-    //HANDLE DEVICES
-    const deviceMap = user.devices ?? new Map();
-
-    //CHECK IF device does not already exist && ACTIVE SUBSCRIPTIONpdate
-    if (!user.isPremium) {
-      deviceMap.clear();
-      deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
-      user.set("devices", deviceMap);
-    } else {
-      // &&
-      // deviceMap.size > 0
-      //ADD TO DEVICES IF DEVICE COUNT IS LESS THAN PREMIUM PLAN
-      const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
-      if (
-        plan &&
-        user.devices.size >= plan.deviceCount &&
-        user.devices.has(deviceId) == false
-      ) {
-        return res.status(400).json({
-          message: `Maximum device exceeded.`,
-          status: false,
-          data: user.devices,
-        });
+    //NEW IMPLEMENTATION
+    const arrDevices = user.devices ?? [];
+    if (arrDevices && Array.isArray(arrDevices)) {
+      if (!user.isPremium) {
+        arrDevices.length = 0;
+        user.devices = [{ deviceName: deviceName, deviceId: deviceId }];
       } else {
-        deviceMap.set(deviceId, { deviceName: deviceName, deviceId: deviceId });
-        user.set("devices", deviceMap);
+        const plan = await Plan.findOne({ _id: user.activePlan.plan_id });
+        const dvExist = arrDevices.find((dv) => dv.deviceId == deviceId);
+
+        //check if plan exist && devices list is equal/above subscription and user device is not contained
+        if (plan && arrDevices.length >= plan.deviceCount && dvExist) {
+          return res.status(400).json({
+            message: `Maximum device exceeded.`,
+            status: false,
+            data: user.devices
+          });
+        } else {
+          if(!dvExist) arrDevices.push({ deviceName: deviceName, deviceId: deviceId });
+          user.devices = arrDevices;
+        }
       }
     }
-
-    // const subscription = user.updateSubscriptionPlan()
-    //create and save session/ device token
     const jwt = user.createJWT();
     user.deviceToken = jwt;
     await user.save();
@@ -86,6 +81,46 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+exports.createUser = async (req, res) => {
+  try {
+    const { email, devices } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: `Please provide your email address.`,
+        data: [],
+        status: false
+      });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({
+        message: `User email already exist.`,
+        data: [],
+        status: false
+      });
+    }
+
+    user = new User({ email: email });
+    if(devices && Array.isArray(devices)){
+      user.devices = devices;
+    }
+    await user.save();
+
+   
+
+    return res.status(200).json({
+      message: "User account created",
+      data: { user, },
+      status: true
+    });
+  } catch (error) {
+    console.log(error);
+    return failedResponseHandler(error, res);
+  }
+};
 exports.sendOTP = async (req, res) => {
   try {
     const { email } = req.body;
@@ -94,7 +129,7 @@ exports.sendOTP = async (req, res) => {
       return res.status(400).json({
         message: `Please provide your email address.`,
         data: [],
-        status: false,
+        status: false
       });
     }
 
@@ -108,33 +143,37 @@ exports.sendOTP = async (req, res) => {
 
     const secret = speakeasy.generateSecret();
 
-    const otp = '123456'
-    // speakeasy.totp({
-    //   secret: secret.base32,
-    //   encoding: "base32",
-    //   time: 600000, // time in 5 minutes
-    // });
+    let otp = speakeasy.totp({
+      secret: secret.base32,
+      encoding: "base32",
+      time: 600000 // time in 5 minutes
+    });
 
+    if(email === 'storedemo@thurvpn.com'){
+      otp =  123456;
+    }
     user.otpSecret = otp;
     await user.save();
 
     const jwt = user.createJWT();
-    const html = `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
-    <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
-    <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
-    </div>`;
+    const msg = "To complete your login, enter the one-time password (OTP)";
+    
+    // const html = `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 10px 20px; max-width: 600px; margin: 0 auto;">
+    // <h2 style="color: #d62333;">Your OTP is ${otp}</h2>
+    // <p style="color: #333;">Use this OTP to verify your account within the next 5 minutes. Do not share this OTP with anyone. If it exceeds 5 minutes, request for a new OTP.</p>
+    // </div>`;
     // send mail with defined transport object
     let info = await mailer.sendMailTo(
-      '"THURVPN" <youremail@gmail.com>',
+      '"THURVPN" <noreply@thurvpn.com>',
       email,
       "OTP REQUEST",
-      html
+      htmlTemplate(msg, '', otp)
     );
 
     return res.status(200).json({
       message: "New OTP generated and sent",
       data: { user, otp, jwt },
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log(error);
@@ -158,7 +197,7 @@ exports.getSingleUser = async (req, res) => {
       return res.status(400).json({
         message: `No user with the provided id`,
         status: false,
-        data: [],
+        data: []
       });
     }
     let purchase = await Purchase.findOne({ user_id: userId }).populate(
@@ -169,24 +208,27 @@ exports.getSingleUser = async (req, res) => {
       purchase = purchase.toObject({ virtuals: true });
       if (purchase.plan_id != null) {
         // get the number of days for the current month
-        const date = new Date();
-        const numOfDays = new Date(date.getFullYear(),date.getMonth()+1,0).getDate() 
+
         //extract days left
-        const daysLeft = purchase.plan_id.duration * numOfDays - purchase.daysCount;
-        delete purchase.user_id
-        delete purchase._id
-        delete purchase.id
+        const endDate = moment(purchase.expire_at);
+        const startDate = moment();
+        const daysLeft = endDate.diff(startDate, "days");
+
+        delete purchase.user_id;
+        delete purchase._id;
+        delete purchase.id;
+        delete purchase.expire_at;
 
         return res.status(200).json({
           message: "User found",
           status: true,
           data: {
-            id:user._id,
+            id: user._id,
             ...user.toObject(),
             daysLeft,
             devices: user.devices,
-            ... purchase,
-          },
+            ...purchase
+          }
         });
       }
     }
@@ -209,7 +251,7 @@ exports.getLatestDevices = async (req, res) => {
           return res.status(400).json({
             message: `Unable to process request`,
             status: false,
-            data: [],
+            data: []
           });
         }
 
@@ -219,7 +261,7 @@ exports.getLatestDevices = async (req, res) => {
           if (user.devices != null) {
             const dvs = user.devices;
             // console.log(user.toObject().devices.values())
-            devices.push(...user.toObject().devices.values());
+            devices.push(...user.toObject().devices);
           }
         }
 
@@ -249,7 +291,7 @@ exports.getUserDevices = async (req, res) => {
       return res.status(400).json({
         message: `No user with the provided id`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -277,17 +319,16 @@ exports.getAllUsers = async (req, res) => {
     return res.status(200).json({
       data: { count: users.length, users },
       status: true,
-      message: "User listed",
+      message: "User listed"
     });
   } catch (error) {
-    console.log(error);
     return failedResponseHandler(error, res);
   }
 };
 
 exports.updateUser = async (req, res) => {
   try {
-    const { id: userId } = req.params;
+    const {_id: userId } = req.body;
 
     if (!userId) {
       return res
@@ -295,25 +336,25 @@ exports.updateUser = async (req, res) => {
         .json({ message: "Missing user ID", data: [], status: false });
     }
     delete req.body.email; //removes email object
-    const updateUser = await User.findByIdAndUpdate({ _id: userId }, req.body, {
+    const user = await User.findByIdAndUpdate({ _id: userId }, req.body, {
       new: true,
-      runValidators: true,
+      runValidators: true
     });
 
-    if (!updateUser) {
+    if (!user) {
       return res
         .status(404)
         .json({ message: "User does not exist", data: [], status: false });
     }
 
-    const subscription = updateUser.updateSubscriptionPlan();
+    const subscription = user.updateSubscriptionPlan();
 
-    await updateUser.save(); // save the updated user object to the database
+    await user.save(); // save the updated user object to the database
 
     return res.status(201).json({
       message: "User data updated successfully",
-      updateUser,
-      subscription,
+      data: { user, },
+      status: true
     });
   } catch (error) {
     console.log(error);
@@ -342,7 +383,7 @@ exports.deleteUser = async (req, res) => {
     return res.status(200).json({
       message: "User deleted successfully",
       data: deleteUser,
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log(error);
@@ -371,20 +412,19 @@ exports.deleteUserDevice = async (req, res) => {
         .json({ message: "User does not exist", data: [], status: false });
     }
 
-    if (!user.devices.has(deviceId)) {
+    if (!user.devices.find((dv) => dv.deviceId == deviceId)) {
       return res
         .status(400)
         .json({ message: "Device does not exist", data: [], status: false });
     }
 
-    user.devices.delete(deviceId);
-    user.set("devices", user.devices);
+   user.devices = user.devices.filter((dv) => dv.deviceId !== deviceId);
 
     await user.save();
     return res.status(200).json({
       message: "Device deleted successfully",
       data: [],
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log(error);
@@ -403,7 +443,7 @@ exports.adminLogin = async (req, res) => {
       return res.status(400).json({
         message: `Please provide all the required parameters: ${msg}`,
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -413,10 +453,16 @@ exports.adminLogin = async (req, res) => {
       return res.status(400).json({
         message: `Email does not exist, please try again with a different email`,
         status: false,
-        data: [],
+        data: []
       });
     }
-
+    if(!user.isAdmin){
+      return res.status(400).json({
+        message: `You are not permitted to use this application`,
+        status: false,
+        data: []
+      });
+    }
     const result = await bcrypt.compare(password, user.pwHash);
 
     if (!result) {
@@ -450,14 +496,14 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: "Please provide your email address.",
         status: false,
-        data: [],
+        data: []
       });
     }
     if (!password) {
       return res.status(400).json({
         message: "Please provide your password.",
         status: false,
-        data: [],
+        data: []
       });
     }
 
@@ -467,7 +513,7 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: "User with the email you supplied already exists.",
         status: false,
-        data: [],
+        data: []
       });
     }
     const hash = await bcrypt.hash(password, 10);
@@ -477,30 +523,29 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: "Unable to create password.",
         status: false,
-        data: [],
+        data: []
       });
     }
 
     const user = await User.create({
       ...req.body,
       otpSecret: null,
-      otpVerified: true,
       pwHash: hash,
-      isAdmin: true,
+      isAdmin: true
     });
 
     if (!user) {
       return res.status(400).json({
         message: "Unable to create user account.",
         status: false,
-        data: [],
+        data: []
       });
     }
 
     return res.status(201).json({
       message: "Account created",
       data: user,
-      status: true,
+      status: true
     });
   } catch (error) {
     console.log("The ERR", error);
