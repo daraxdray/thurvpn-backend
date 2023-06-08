@@ -62,6 +62,22 @@ pipeline {
                 }
             }
         }
+
+        stage("Push Image to ECR"){
+            when {
+                expression {
+                    BRANCH_NAME == 'devops-aws-20230224'
+                }
+            }
+
+                steps {
+                    script {
+                        gv.pushImage()
+                    }
+            }
+
+        }
+
         stage("deploy") {
             when {
                 expression {
