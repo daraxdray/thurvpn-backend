@@ -127,13 +127,14 @@ exports.getServerFile = async (req, res) => {
 };
 
 exports.createVpn = async (req, res) => {
-  const { country, code, image, regions, unicode, isPremium } = req.body;
+  const { country, code, image, regions, unicode, isPremium, continent } = req.body;
 
   try {
-    if (!country || !code || !image) {
+    if (!country || !code || !image || !continent) {
       const msg =
         (!country ? "Country name, " : "") +
         (!code ? "Country code, " : "") +
+        (!continent ? "Continent, " : "") +
         (!image ? "Image, " : "");
       return res.status(400).json({
         data: [],
@@ -189,6 +190,7 @@ exports.createVpn = async (req, res) => {
       const vpn = await vpnModel.create({
         country: country,
         countryCode: code.toUpperCase(),
+        continent:continent,
         countryImage: image,
         unicode: unicode,
         regions: regions,
@@ -447,6 +449,7 @@ exports.updateCountry = async (req, res) => {
       regions,
       unicode,
       premium: isPremium,
+      continent,
       _id,
     } = req.body;
 
@@ -474,6 +477,9 @@ exports.updateCountry = async (req, res) => {
     }
     if (unicode) {
       vp.unicode = unicode;
+    }
+    if (continent) {
+      vp.continent = continent;
     }
     if (isPremium != undefined) {
       vp.isPremium = isPremium;
@@ -680,14 +686,18 @@ exports.addRegions = async (req, res) => {
 
 exports.getVpnByQuery = async (req, res) => {
   try {
-    const { country, code } = req.query;
+    const { country, code, continent } = req.query;
 
     let findVpn;
     if (country) {
       findVpn = await vpnModel.findOne({ countryName: country });
     } else if (code) {
       findVpn = await vpnModel.findOne({ countryCode: code });
-    } else {
+    }
+    else if(continent){
+      findVpn = await vpnModel.findBy({continent:continent});
+    }
+     else {
       return res.status(400).json({
         data: [],
         status: false,
@@ -712,6 +722,81 @@ exports.getVpnByQuery = async (req, res) => {
     return failedResponseHandler(error, res);
   }
 };
+
+
+exports.getAllVpnByContinent = async (req, res) => {
+  try {
+    
+    let findVpn;
+   
+      findVpn = await vpnModel.aggregate([
+        {
+           $group : {
+              _id : "$continent",
+              countries: { $push: "$$ROOT" }
+           }
+        }])
+   
+
+    if (!findVpn) {
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided query",
+      });
+    }
+
+    return res.status(200).json({
+      data: findVpn,
+      status: true,
+      message: "VPN found",
+    });
+  } catch (error) {
+    return failedResponseHandler(error, res);
+  }
+};
+
+exports.getVpnByContinent = async (req, res) => {
+  try {
+    const { continent } = req.query;
+
+    let findVpn;
+     if(continent){
+      findVpn = await vpnModel.aggregate([
+        {
+           $group : {
+              _id : "$continent",
+              count: { $sum: 1 }
+           }
+        }])
+    }
+     else {
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "You have not provided any query parameter",
+      });
+    }
+
+    if (!findVpn) {
+      return res.status(400).json({
+        data: [],
+        status: false,
+        message: "Unable to get vpn of provided query",
+      });
+    }
+
+    return res.status(200).json({
+      data: { ...findVpn.toObject() },
+      status: true,
+      message: "VPN found",
+    });
+  } catch (error) {
+    return failedResponseHandler(error, res);
+  }
+};
+
+
 
 exports.deleteVpn = async (req, res) => {
   try {

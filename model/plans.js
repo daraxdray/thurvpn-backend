@@ -1,59 +1,64 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const planSchema = new mongoose.Schema({
-    title : {
-        type : String,
-        required: true
-    },
+  title: {
+    type: String,
+    required: true,
+  },
 
-    description : {
-        type : String,
-        required: true
-    },
+  description: {
+    type: String,
+    required: true,
+  },
 
-    price : {
-        type : Number,
-        required: true
-    },
+  price: {
+    type: Number,
+    required: true,
+  },
+  imageUrl:{
+    type: String,
+    default:''
+  },
+  duration: {
+    type: Number,
+    required: true,
+  },
+  deviceCount: {
+    type: Number,
+    default: 1,
+    required: true,
+  },
+  iapCode: {
+    type: String,
+    required: true,
+  },
+  features: {
+    type: Array,
+    default: [],
+  },
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+});
+planSchema.set("toObject", { virtuals: true });
+planSchema.set("toJSON", { virtuals: true });
+planSchema.pre("save", function (next) {
+  const now = Date.now();
+  this.updated_at = now;
+  if (!this.created_at) {
+    this.created_at = now;
+  }
+  next();
+});
 
-    duration : {
-        type : Number,
-        required: true,
-        unique:true
-    },
-    deviceCount: {
-        type:Number,
-        default:1,
-        required:true
-    },
-    iapCode: {
-        type:String,
-        required:true
-    },
-    active : {
-        type : Boolean,
-        default: true
-    },
-    created_at: { type: Date, default: Date.now },
-    updated_at: { type: Date, default: Date.now }
-})
-planSchema.set('toObject', { virtuals: true })
-planSchema.set('toJSON', { virtuals: true });
-planSchema.pre('save', function(next) {
-    const now = Date.now();
-    this.updated_at = now;
-    if (!this.created_at) {
-      this.created_at = now;
-    }
-    next();
-  });
-  
-  planSchema.pre('update', function(next) {
-    const now = Date.now();
-    this.updated_at = now;
-    next();
-  });
-
+planSchema.pre("update", function (next) {
+  const now = Date.now();
+  this.updated_at = now;
+  next();
+});
 
 // author: {
 //     type: mongoose.Schema.Types.ObjectId,
@@ -68,4 +73,4 @@ planSchema.pre('save', function(next) {
 //       console.log(post);
 //     }
 //   });
-module.exports = mongoose.model('Plan', planSchema)
+module.exports = mongoose.model("Plan", planSchema);

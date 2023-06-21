@@ -18,9 +18,11 @@ const {
   getServerFile,
   deleteAllVpnWhere,
   updateCountry,
+  getAllVpnByContinent
 } = require("../controllers/vpn");
 
 router.route("/get-all").get(getAllVpn);
+router.route("/get-continents").get(getAllVpnByContinent);
 router.route("/get-all-file").get(getAllFileVpn);
 router.route("/dwn/:cc").get(dwn);
 router.route("/gsf/:cc/:slug").get(getServerFile);
