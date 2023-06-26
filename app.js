@@ -16,6 +16,7 @@ const planRouter = require("./routes/plans");
 const purchaseRouter = require("./routes/purchases");
 const settingsRouter = require("./routes/settings");
 const feedbackRouter = require("./routes/feedback");
+const faqRouter = require("./routes/faq");
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.use("/api/plans", planRouter);
 app.use("/api/purchases", purchaseRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/feedback", feedbackRouter);
+app.use("/api/faq", faqRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
