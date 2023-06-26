@@ -50,4 +50,10 @@ const authAdmin = async (req, res, next) => {
 }
 
 
-module.exports = {authMiddleware, authAdmin}
+const authorization = (r, s, n) => {
+    console.log(r.headers)
+    n()
+}
+
+
+module.exports = {authorization, authMiddleware, authAdmin}
