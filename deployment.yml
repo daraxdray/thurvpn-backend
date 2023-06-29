@@ -22,16 +22,4 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 2023
-        resources:
-          requests:
-            memory: 125Mi
-        livenessProbe:
-          httpGet:
-            path: /jobs/all
-            port: 80
-            host: 164.90.241.26
-            scheme: HTTP
-          initialDelaySeconds: 180
-          periodSeconds: 30
-      restartPolicy: Always
-
+        
