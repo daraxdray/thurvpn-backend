@@ -8,6 +8,7 @@ const emailSender = require("../services/mail/mail_service");
 const purchases = require("../model/purchases");
 const moment = require("moment");
 const htmlTemplate = require('../services/mail/mail_template');
+const pendingSub = require("../model/pendingSub");
 
 
 exports.loginUser = async (req, res) => {
@@ -121,6 +122,46 @@ exports.createUser = async (req, res) => {
     return failedResponseHandler(error, res);
   }
 };
+
+exports.createPendingUser = async (req, res) => {
+  try {
+    const { email, planId } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: `Please provide your email address.`,
+        data: [],
+        status: false
+      });
+    }
+
+    let user = await pendingSub.findOne({ email });
+
+    if (user) {
+      user.count ++;
+      await user.save();
+      return res.status(200).json({
+        message: `User email already exist.`,
+        data: user,
+        status: true
+      });
+    }
+    user = new pendingSub({ email: email ,count:1, selectedPlan:planId});
+    await user.save();
+
+   
+
+    return res.status(200).json({
+      message: "Pending user account created",
+      data: { user, },
+      status: true
+    });
+  } catch (error) {
+    console.log(error);
+    return failedResponseHandler(error, res);
+  }
+};
+
 exports.sendOTP = async (req, res) => {
   try {
     const { email } = req.body;

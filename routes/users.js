@@ -13,11 +13,13 @@ const {
   adminLogin,
   deleteUserDevice,
   getLatestDevices,
-  createUser
+  createUser,
+  createPendingUser
 } = require("../controllers/users");
 
 router.route("/login").post(loginUser);
 router.route("/create").post(createUser);
+router.route("/pending-sub").post(createPendingUser);
 router.route("/send-otp").post(sendOTP);
 //ensure delete device comes first
 router.route("/delete-device").delete(deleteUserDevice);
