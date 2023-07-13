@@ -139,6 +139,7 @@ exports.createPendingUser = async (req, res) => {
 
     if (user) {
       user.count ++;
+      user.selectedPlan = planId;
       await user.save();
       return res.status(200).json({
         message: `User email already exist.`,
