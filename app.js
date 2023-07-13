@@ -29,7 +29,7 @@ var corsOptions = {
   origin: [
     "http://localhost:3000",
     "https://admin.thurvpn.com",
-    
+    "https://thurvpn.com"
   ],
   credentials: true,
   methods: "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS",
